@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
-project (LuaGUIEngine)
+project (IrrLuaEngine)
 
 SET(CMAKE_BUILD_TYPE Debug)
 
@@ -15,11 +15,10 @@ ELSE()
 	SET(IRRLICHT_LIBRARY "${CMAKE_SOURCE_DIR}/${WORKSPACE}irrlicht-1.7.3/lib/Linux/libIrrlicht${LIBRARY_EXTENSION}")
 	SET(LUAJIT_LIBRARY "${CMAKE_SOURCE_DIR}/${WORKSPACE}luajit-2.0/src/libluajit${LIBRARY_EXTENSION}")
 	SET(ADDITIONAL_LIBS "Xxf86vm")
+	find_package(GLUT)
 ENDIF()
 
 
-
-#find_package(GLUT)
 find_package(OpenGL)
 
 SET(SUBDIRS "GUI")

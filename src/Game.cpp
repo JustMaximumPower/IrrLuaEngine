@@ -1,10 +1,3 @@
-/*
- * Game.cpp
- *
- *  Created on: 03.04.2010
- *      Author: Max
- */
-
 #include "Game.h"
 #include <fstream>
 #include <time.h>
