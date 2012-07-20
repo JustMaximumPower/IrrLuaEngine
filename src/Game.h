@@ -26,10 +26,9 @@
 #include <lua.hpp>
 #include <irrlicht.h>
 
-namespace Gui
-{
-    class TestcaseEngine;
-}
+
+class TestcaseEngine;
+
 
 class Game
 {
@@ -44,7 +43,7 @@ public:
 
 	void closeGame();
 
-	Gui::TestcaseEngine* getUserInterface() const;
+	TestcaseEngine* getUserInterface() const;
 
 	irr::IrrlichtDevice* getIrrlichtDevice() const;
 
@@ -52,7 +51,7 @@ public:
 
 private:
 
-    Gui::TestcaseEngine* m_script;
+    TestcaseEngine* m_script;
 
 	irr::IrrlichtDevice* m_device;
 

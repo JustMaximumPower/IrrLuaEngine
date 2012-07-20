@@ -64,7 +64,7 @@ void Game::init(int argc, const char* argv[])
 	skin->setFont(font);
 	m_device->getGUIEnvironment()->setSkin(skin);
 
-    m_script = new Gui::TestcaseEngine(m_device,this);
+    m_script = new TestcaseEngine(m_device,this);
     m_script->init();
     m_script->runFile("main.lua");
 

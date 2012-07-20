@@ -40,7 +40,7 @@ namespace Gui {
     }
 
 
-    GuiButton::GuiButton(LuaEngine* engine, GuiElement* parent, lua_State* plua):GuiElement(engine,parent,plua)
+    GuiButton::GuiButton(Script::LuaEngine* engine, GuiElement* parent, lua_State* plua):GuiElement(engine,parent,plua)
     {
         m_irrElement = NULL;
     }
@@ -88,7 +88,7 @@ namespace Gui {
 
     int GuiButton::lua_new(lua_State* pLua)
     {
-        LuaEngine* engine = LuaEngine::getThisPointer<LuaEngine>(pLua);
+        Script::LuaEngine* engine = Script::LuaEngine::getThisPointer<Script::LuaEngine>(pLua);
         GuiButton* pthis = new GuiButton(engine,NULL,pLua);
 
         pthis->pushToStack();

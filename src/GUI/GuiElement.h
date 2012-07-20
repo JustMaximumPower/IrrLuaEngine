@@ -29,7 +29,7 @@
 
 
 
-namespace Gui 
+namespace Script 
 {   
     class LuaEngine;
 } 
@@ -42,7 +42,7 @@ namespace Gui
 
     public:
 
-        GuiElement(LuaEngine* engine, GuiElement *parent, lua_State* plua);
+        GuiElement(Script::LuaEngine* engine, GuiElement *parent, lua_State* plua);
 
         ~GuiElement();
 
@@ -75,7 +75,7 @@ namespace Gui
 
         lua_State*  m_lua;
 
-        LuaEngine* m_engine;
+        Script::LuaEngine* m_engine;
 
     private:
 

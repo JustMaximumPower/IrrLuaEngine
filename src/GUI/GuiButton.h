@@ -29,7 +29,7 @@
 
 
 
-namespace Gui 
+namespace Script 
 {   
     class LuaEngine;
 } 
@@ -44,7 +44,7 @@ namespace Gui
 
         static void createMatatable(lua_State* pLua);
 
-        GuiButton(LuaEngine* engine, GuiElement *parent, lua_State* plua);
+        GuiButton(Script::LuaEngine* engine, GuiElement *parent, lua_State* plua);
 
         ~GuiButton();
 

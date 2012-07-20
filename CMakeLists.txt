@@ -21,7 +21,7 @@ ENDIF()
 
 find_package(OpenGL)
 
-SET(SUBDIRS "GUI")
+SET(SUBDIRS "GUI" "Script")
 
 FILE(GLOB_RECURSE SOURCES "src/*.cpp")
 FILE(GLOB_RECURSE HEADERS "src/*.h")

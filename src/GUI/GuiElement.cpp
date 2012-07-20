@@ -4,7 +4,7 @@
 
 namespace Gui {
 
-    GuiElement::GuiElement(LuaEngine* engine, GuiElement *parent, lua_State* plua)
+    GuiElement::GuiElement(Script::LuaEngine* engine, GuiElement *parent, lua_State* plua)
     {
         m_engine = engine;
         m_parent = parent;

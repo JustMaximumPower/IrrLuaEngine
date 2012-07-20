@@ -35,7 +35,7 @@ namespace Gui
     class GuiElement;
 }
 
-namespace Gui
+namespace Script
 {
 
     class LuaEngine : public irr::IEventReceiver
@@ -56,7 +56,7 @@ namespace Gui
         
         void run();
 
-        int getFreeId(GuiElement* e);
+        int getFreeId(Gui::GuiElement* e);
 
         void freeElement(int i);
 
@@ -69,7 +69,7 @@ namespace Gui
 
         virtual bool OnEvent(const irr::SEvent&);
         
-        GuiElement* getElement(int id);
+        Gui::GuiElement* getElement(int id);
 
         //---- Lua funktions ------
 
@@ -89,7 +89,7 @@ namespace Gui
 
 
     private:
-        irr::core::array<GuiElement*>
+        irr::core::array<Gui::GuiElement*>
                             m_elements;
         int         m_errorhandler;
 

@@ -3,7 +3,7 @@
 #include "IGUIEnvironment.h"
 #include "GuiButton.h"
 
-namespace Gui 
+namespace Script 
 {
 
     const struct luaL_reg LuaEngine::lua_globls [] = {
@@ -67,10 +67,10 @@ namespace Gui
 
         addLibraries();
 
-        GuiButton::createMatatable(m_lua);
+        Gui::GuiButton::createMatatable(m_lua);
     }
 
-    int LuaEngine::getFreeId(GuiElement* e)
+    int LuaEngine::getFreeId(Gui::GuiElement* e)
     {
         m_elements.push_back(e);
         return m_elements.size();
@@ -105,7 +105,7 @@ namespace Gui
             if(e.GUIEvent.Caller)
     	    {
 			    int id = e.GUIEvent.Caller->getID();
-                GuiElement* element = getElement(id);
+                Gui::GuiElement* element = getElement(id);
                 if(element)
 			    {
 				    switch(e.GUIEvent.EventType)
@@ -144,7 +144,7 @@ namespace Gui
         return 0;
     }
 
-    GuiElement* LuaEngine::getElement(int id)
+    Gui::GuiElement* LuaEngine::getElement(int id)
     {
         if(id < m_elements.size())
 	    {

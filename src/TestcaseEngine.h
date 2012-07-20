@@ -29,34 +29,29 @@
 
 class Game;
 
-namespace Gui
+
+class TestcaseEngine : public Script::LuaEngine
 {
 
-    class TestcaseEngine : public LuaEngine
-    {
+public:
+    TestcaseEngine(irr::IrrlichtDevice* irr, Game* g);
 
-    public:
-        TestcaseEngine(irr::IrrlichtDevice* irr, Game* g);
+    virtual const luaL_reg* getGlobals();
 
-        virtual const luaL_reg* getGlobals();
+    virtual void addLibraries();
 
-        virtual void addLibraries();
+    //---- Lua funktions ------
 
-        //---- Lua funktions ------
+    static int lua_ExitGame(lua_State* pLua);
 
-        static int lua_ExitGame(lua_State* pLua);
+    //---- Lua Constants ------
 
-        //---- Lua Constants ------
+    static const char * lua_libName ;
 
-        static const char * lua_libName ;
-
-        static const luaL_reg lua_lib [];
+    static const luaL_reg lua_lib [];
     
-    private:
-        Game* m_game;
-    };
-    
-
-} 
-
+private:
+    Game* m_game;
+};
+   
 #endif 
