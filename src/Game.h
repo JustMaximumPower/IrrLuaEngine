@@ -35,6 +35,7 @@ class Game
 public:
 
 	Game();
+
 	virtual ~Game();
 
 	void init(int argc, const char* argv[]);

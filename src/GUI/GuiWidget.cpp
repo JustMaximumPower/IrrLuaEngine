@@ -1,45 +1,49 @@
-#include "GuiButton.h"
+#include "GuiWidget.h"
 #include "LuaEngine.h"
 #include "IrrlichtDevice.h"
 #include "IGUIEnvironment.h"
+#include "GuiButton.h"
 
 
-namespace Gui {
 
-    const char* GuiButton::lua_libName = "Button";
+namespace Gui 
+{
 
-    const char* GuiButton::lua_metatableName = "Lua.Button";
+    const char* GuiWidget::lua_libName = "Widget";
 
-    const struct luaL_reg GuiButton::lua_lib_m [] = {
+    const char* GuiWidget::lua_metatableName = "Lua.Widget";
+
+    const struct luaL_reg GuiWidget::lua_lib_m [] = {
         {"__gc",lua_GC},
         {"__index",lua_index},
         {"__newindex",lua_newindex},
+        {"addElement",lua_addElement},
         {NULL, NULL}  /* sentinel */
     };
 
-    const struct luaL_reg GuiButton::lua_lib_f [] = {
+    const struct luaL_reg GuiWidget::lua_lib_f [] = {
         {"new",lua_new},
         {NULL, NULL}  /* sentinel */
     };
 
-    void GuiButton::createMatatable(lua_State* pLua)
+    void GuiWidget::createMatatable(lua_State* pLua)
     {
         luaL_newmetatable(pLua, lua_metatableName);
-
+    
         luaL_openlib(pLua, NULL, lua_lib_m, 0);
         luaL_openlib(pLua, lua_libName, lua_lib_f, 0);
     }
 
 
-    GuiButton::GuiButton(Script::LuaEngine* engine, lua_State* plua):GuiElement(engine,plua)
+    GuiWidget::GuiWidget(Script::LuaEngine* engine, lua_State* plua):GuiElement(engine, plua)
     {
         m_irrElement = NULL;
         m_type = lua_metatableName;
     }
     
-    GuiButton::~GuiButton()
+    GuiWidget::~GuiWidget()
     {
-        printf("GuiButton::~GuiButton\n");
+        printf("GuiWidget::~GuiWidget\n");
         if(m_irrElement)
         {
             m_irrElement->drop();
@@ -47,41 +51,41 @@ namespace Gui {
         }
     }
 
-    const luaL_reg* GuiButton::getMethods()
+    const luaL_reg* GuiWidget::getMethods()
     {
         return lua_lib_m;
     }
         
-    const luaL_reg* GuiButton::getFunktions()
+    const luaL_reg* GuiWidget::getFunktions()
     {
         return lua_lib_f;
     }
 
-    const char* GuiButton::getTableName()
+    const char* GuiWidget::getTableName()
     {
         return lua_libName;
     }
 
-    const char* GuiButton::getMetaTableName()
+    const char* GuiWidget::getMetaTableName()
     {
         return lua_metatableName;
     }
 
 
-    int GuiButton::lua_GC(lua_State* pLua)
+    int GuiWidget::lua_GC(lua_State* pLua)
     {
-        printf("GuiButton::lua_GC\n");
-        GuiButton* pthis = *static_cast<GuiButton**>(luaL_checkudata(pLua, 1, lua_metatableName));
+        printf("GuiWidget::lua_GC\n");
+        GuiWidget* pthis = *static_cast<GuiWidget**>(luaL_checkudata(pLua, 1, lua_metatableName));
         
         pthis->onLuaGC();
 
         return 0;
     }
 
-    int GuiButton::lua_new(lua_State* pLua)
+    int GuiWidget::lua_new(lua_State* pLua)
     {
         Script::LuaEngine* engine = Script::LuaEngine::getThisPointer<Script::LuaEngine>(pLua);
-        GuiButton* pthis = new GuiButton(engine,pLua);
+        GuiWidget* pthis = new GuiWidget(engine,pLua);
 
         pthis->pushToStack();
 
@@ -96,31 +100,27 @@ namespace Gui {
         const char* text    = luaL_optlstring(pLua,5,"",&len);
         wchar_t* textw      =  new wchar_t[++len];
         mbstowcs(textw, text, len);
-        const char* tooltip = luaL_optlstring(pLua,6,"",&len);
-        wchar_t* tooltipw      =  new wchar_t[++len];
-        mbstowcs(tooltipw, tooltip, len);
 
 
-        irr::gui::IGUIButton* b = engine->getIrrlichtDevice()->getGUIEnvironment()->addButton(
+        irr::gui::IGUIWindow* b = engine->getIrrlichtDevice()->getGUIEnvironment()->addWindow(
                 irr::core::recti(x,y,x+w,y+h),
-                NULL,
-                pthis->getId(),
+                false,
                 textw,
-                tooltipw
+                NULL,
+                pthis->getId()
             );
 
         pthis->m_irrElement = b;
 
         delete textw;
-        delete tooltipw;
 
         return 1;
     }
 
     
-    int GuiButton::lua_index(lua_State* pLua)
+    int GuiWidget::lua_index(lua_State* pLua)
     {
-        GuiButton* pthis = *static_cast<GuiButton**>(luaL_checkudata(pLua, 1, lua_metatableName));
+        GuiWidget* pthis = *static_cast<GuiWidget**>(luaL_checkudata(pLua, 1, lua_metatableName));
         const char* key = luaL_checkstring(pLua, 2);
 
         if(!strcmp("toolTip",key))
@@ -158,9 +158,9 @@ namespace Gui {
     }
 
 
-    int GuiButton::lua_newindex(lua_State* pLua)
+    int GuiWidget::lua_newindex(lua_State* pLua)
     {
-        GuiButton* pthis = *static_cast<GuiButton**>(luaL_checkudata(pLua, 1, lua_metatableName));
+        GuiWidget* pthis = *static_cast<GuiWidget**>(luaL_checkudata(pLua, 1, lua_metatableName));
         const char* key = luaL_checkstring(pLua, 2);
 
         if(!strcmp("toolTip",key))
@@ -198,16 +198,41 @@ namespace Gui {
         pthis->onLuaNewIndex();
         return 0;
     }
+    
+    int GuiWidget::lua_addElement(lua_State* pLua)
+    {
+        GuiWidget* pthis = *static_cast<GuiWidget**>(luaL_checkudata(pLua, 1, lua_metatableName));
+        GuiElement* e = NULL;
+        lua_getfield(pLua,2,"type");
 
-    void GuiButton::draw()
+        const char* type = lua_tostring(pLua,-1);
+
+        GuiElement* pother = *static_cast<GuiElement**>(luaL_checkudata(pLua, 2, type));
+
+        pthis->m_children.push_back(pother);
+        pother->grab();
+
+        irr::gui::IGUIElement* irrE = pother->getIrrlichtElement();
+
+        pthis->m_irrElement->addChild(irrE);
+
+        return 0;
+    }
+
+    void GuiWidget::draw()
     {
         if(m_irrElement)
         {
             m_irrElement->draw();
         }
+
+        for(irr::u32 i = 0; i < m_children.size(); i++)
+        {
+            m_children[i]->draw();
+        }
     }
 
-    irr::gui::IGUIElement* GuiButton::getIrrlichtElement()
+    irr::gui::IGUIElement* GuiWidget::getIrrlichtElement()
     {
         return m_irrElement;
     }

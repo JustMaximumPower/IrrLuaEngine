@@ -24,8 +24,9 @@
 #define Main_UserInterface_GuiButton_h
 
 
-#include <GuiElement.h>
+#include "GuiElement.h"
 #include <lua.hpp>
+#include <IGUIButton.h>
 
 
 
@@ -44,7 +45,7 @@ namespace Gui
 
         static void createMatatable(lua_State* pLua);
 
-        GuiButton(Script::LuaEngine* engine, GuiElement *parent, lua_State* plua);
+        GuiButton(Script::LuaEngine* engine, lua_State* plua);
 
         ~GuiButton();
 
@@ -57,6 +58,8 @@ namespace Gui
         virtual const char* getTableName();
 
         virtual const char* getMetaTableName();
+
+        virtual irr::gui::IGUIElement* getIrrlichtElement();
 
         //---- Lua funktions ------
 
@@ -79,10 +82,10 @@ namespace Gui
         static const struct luaL_reg lua_lib_f [];
 
     protected:
-        irr::gui::IGUIElement *m_irrElement;
+        irr::gui::IGUIButton *m_irrElement;
     };
 
-} /* End of namespace Main::UserInterface */
+}
 
 
-#endif // Main_UserInterface_GuiElement_h
+#endif

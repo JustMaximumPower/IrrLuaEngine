@@ -1,13 +1,13 @@
 
 
 
-function createButton(x,y)
+function createButton(w,x,y)
 	btn = Button.new(x,y,100,100,"0","")
 
 	btn.test = 0
 
 	btn.onButton = function(this)
-		Game.exit()
+		this.enabled = not this.enabled
 	end
 
 	btn.onHover = function(this)
@@ -17,21 +17,24 @@ function createButton(x,y)
 
 	end
 
-
+	w:addElement(btn)
+	
 	return btn
 end
 
 
 print("lua loaded")
 
+w = Widget.new(100,100,500,200,"Hi")
+
 suspend()
 
 buttons = {}
 
-for i=0, 6 do
+for i=0, 3 do
 	buttons[i] = {}
-	for y=0, 7 do
-		buttons[i][y] = createButton(y*100,i*100)
+	for y=0, 3 do
+		buttons[i][y] = createButton(w,y*100,i*100)
 	end
 	
 end

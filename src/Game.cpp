@@ -17,30 +17,8 @@ Game::~Game()
     delete m_script;
 }
 
-
-void rand_seed()
-{
-	time_t timeval; /* Current time. */
-	unsigned char *ptr; /* Type punned pointed into timeval. */
-	unsigned seed; /* Generated seed. */
-	size_t i;
-
-	timeval = time(NULL);
-	ptr = (unsigned char *) &timeval;
-
-	seed = 0;
-	for (i = 0; i < sizeof timeval; i++)
-		seed = seed * (UCHAR_MAX + 2u) + ptr[i];
-
-	printf("seeding with %i", seed);
-	srand(seed);
-}
-
 void Game::init(int argc, const char* argv[])
 {
-
-	rand_seed();
-
 	irr::SIrrlichtCreationParameters s;
 
 	s.AntiAlias = 0;
@@ -73,7 +51,6 @@ void Game::init(int argc, const char* argv[])
 
 int Game::run()
 {
-
 	while (m_device->run())
 	{
         m_script->run();

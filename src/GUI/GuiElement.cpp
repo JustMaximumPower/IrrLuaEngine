@@ -4,10 +4,11 @@
 
 namespace Gui {
 
-    GuiElement::GuiElement(Script::LuaEngine* engine, GuiElement *parent, lua_State* plua)
+    GuiElement::GuiElement(Script::LuaEngine* engine, lua_State* plua)
     {
         m_engine = engine;
-        m_parent = parent;
+        m_parent = NULL;
+        m_type = "";
         m_lua = plua;
 
         m_id = engine->getFreeId(this);
@@ -60,6 +61,13 @@ namespace Gui {
     void GuiElement::onLuaIndex()
     {
         const char* key = luaL_checkstring(m_lua, 2);
+
+        if(!strcmp("type",key))
+        {
+            lua_pushstring(m_lua,m_type);
+            return;
+        }
+
         lua_getmetatable(m_lua, 1);
         lua_getfield(m_lua, -1, key);
 

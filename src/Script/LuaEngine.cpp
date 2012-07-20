@@ -2,6 +2,7 @@
 #include "IrrlichtDevice.h"
 #include "IGUIEnvironment.h"
 #include "GuiButton.h"
+#include "GuiWidget.h"
 
 namespace Script 
 {
@@ -68,6 +69,7 @@ namespace Script
         addLibraries();
 
         Gui::GuiButton::createMatatable(m_lua);
+        Gui::GuiWidget::createMatatable(m_lua);
     }
 
     int LuaEngine::getFreeId(Gui::GuiElement* e)
@@ -140,18 +142,14 @@ namespace Script
         LuaEngine* pthis = getThisPointer<LuaEngine>(pLua);
         
 
-
         return 0;
     }
 
     Gui::GuiElement* LuaEngine::getElement(int id)
     {
-        if(id < m_elements.size())
+        if(id > 0 && id <= (int) m_elements.size() && m_elements[id-1])
 	    {
-            if(m_elements[id-1])
-            {
-                return m_elements[id-1];
-            }
+            return m_elements[id-1];
         }
         return NULL;
     }

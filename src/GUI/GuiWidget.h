@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (C) 2012 Moritz Kühner, Germany.
+* Copyright (C) 2012 Moritz Kï¿½hner, Germany.
 *
 * Permission is hereby granted, free of charge, to any person obtaining
 * a copy of this software and associated documentation files (the
@@ -20,13 +20,13 @@
 * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ******************************************************************************/
-#ifndef Main_UserInterface_GuiElement_h
-#define Main_UserInterface_GuiElement_h
+#ifndef Main_UserInterface_GuiWidget_h
+#define Main_UserInterface_GuiWidget_h
 
 
-#include <IGUIElement.h>
+#include "GuiElement.h"
 #include <lua.hpp>
-
+#include <IGUIWindow.h>
 
 
 namespace Script 
@@ -37,55 +37,57 @@ namespace Script
 namespace Gui 
 {
 
-    class GuiElement : public irr::IReferenceCounted 
+    class GuiWidget : public GuiElement
     {
 
-    public:
+     public:
 
-        GuiElement(Script::LuaEngine* engine, lua_State* plua);
+        static void createMatatable(lua_State* pLua);
 
-        ~GuiElement();
+        GuiWidget(Script::LuaEngine* engine, lua_State* plua);
 
-        virtual void draw() = 0;
+        ~GuiWidget();
 
-        virtual const luaL_reg* getMethods() = 0;
+        virtual void draw();
+
+        virtual const luaL_reg* getMethods();
         
-        virtual const luaL_reg* getFunktions() = 0;
+        virtual const luaL_reg* getFunktions();
 
-        virtual const char* getTableName() = 0;
+        virtual const char* getTableName();
 
-        virtual const char* getMetaTableName() = 0;
+        virtual const char* getMetaTableName();
 
-        virtual irr::gui::IGUIElement* getIrrlichtElement() = 0;
+        virtual irr::gui::IGUIElement* getIrrlichtElement();
 
-        void pushToStack();
+        //---- Lua funktions ------
 
-        void onEvent(const char* event);
+        static int lua_new(lua_State* pLua);
 
-        const int getId() const
-        {
-            return m_id;
-        }
+        static int lua_GC(lua_State* pLua);
+
+        static int lua_index(lua_State* pLua);
+
+        static int lua_newindex(lua_State* pLua);
+
+        static int lua_addElement(lua_State* pLua);
+
+        //---- Lua Constants ------
+
+        static const char* lua_libName;
+
+        static const char* lua_metatableName;
+
+        static const struct luaL_reg lua_lib_m [];
+
+        static const struct luaL_reg lua_lib_f [];
 
     protected:
-
-        void onLuaGC();
-        void onLuaIndex();
-        void onLuaNewIndex();
-
-        GuiElement *m_parent;
-
-        lua_State*  m_lua;
-
-        Script::LuaEngine* m_engine;
-        const char* m_type;
-
-    private:
-        
-        int m_id;
+        irr::gui::IGUIWindow *m_irrElement;
+        irr::core::array<GuiElement*> m_children;
     };
 
-} 
+} /* End of namespace Main::UserInterface */
 
 
-#endif 
+#endif // Main_UserInterface_GuiElement_h
