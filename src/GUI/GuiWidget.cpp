@@ -1,5 +1,6 @@
 #include "GuiWidget.h"
 #include "LuaEngine.h"
+#include "GuiPlugin.h"
 #include "IrrlichtDevice.h"
 #include "IGUIEnvironment.h"
 #include "GuiButton.h"
@@ -35,7 +36,7 @@ namespace Gui
     }
 
 
-    GuiWidget::GuiWidget(Script::LuaEngine* engine, lua_State* plua):GuiElement(engine, plua)
+    GuiWidget::GuiWidget(GuiPlugin* plugin, lua_State* plua):GuiElement(plugin, plua)
     {
         m_irrElement = NULL;
         m_type = lua_metatableName;
@@ -44,6 +45,15 @@ namespace Gui
     GuiWidget::~GuiWidget()
     {
         printf("GuiWidget::~GuiWidget\n");
+
+        for(irr::u32 i = 0; i < m_children.size(); i++)
+        {
+            m_irrElement->removeChild(m_children[i]->getIrrlichtElement());
+            m_children[i]->drop();
+        }
+        m_children.clear();
+       
+
         if(m_irrElement)
         {
             m_irrElement->drop();
@@ -84,8 +94,9 @@ namespace Gui
 
     int GuiWidget::lua_new(lua_State* pLua)
     {
-        Script::LuaEngine* engine = Script::LuaEngine::getThisPointer<Script::LuaEngine>(pLua);
-        GuiWidget* pthis = new GuiWidget(engine,pLua);
+        GuiPlugin* plugin = GuiPlugin::getThisPointer(pLua);
+        Script::LuaEngine* engine = Script::LuaEngine::getThisPointer(pLua);
+        GuiWidget* pthis = new GuiWidget(plugin,pLua);
 
         pthis->pushToStack();
 
@@ -214,7 +225,10 @@ namespace Gui
 
         irr::gui::IGUIElement* irrE = pother->getIrrlichtElement();
 
-        pthis->m_irrElement->addChild(irrE);
+        if(irrE)
+        {
+            pthis->m_irrElement->addChild(irrE);
+        }
 
         return 0;
     }

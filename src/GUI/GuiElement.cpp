@@ -1,17 +1,20 @@
 #include "GuiElement.h"
 #include "LuaEngine.h"
+#include "GuiPlugin.h"
 
 
-namespace Gui {
+namespace Gui 
+{
 
-    GuiElement::GuiElement(Script::LuaEngine* engine, lua_State* plua)
+
+    GuiElement::GuiElement(GuiPlugin* plugin, lua_State* plua)
     {
-        m_engine = engine;
+        m_plugin = plugin;
         m_parent = NULL;
         m_type = "";
         m_lua = plua;
 
-        m_id = engine->getFreeId(this);
+        m_id = m_plugin->getFreeId(this);
         lua_pushlightuserdata(m_lua, (void *)this);  /* push value */
         lua_newtable(m_lua);
         /* registry[&Key] = myNumber */
@@ -21,7 +24,8 @@ namespace Gui {
     
     GuiElement::~GuiElement()
     {
-        m_engine->freeElement(m_id);
+        m_plugin->freeElement(m_id);
+
         lua_pushlightuserdata(m_lua, (void *)this);  /* push value */
         lua_pushnil(m_lua);
         /* registry[&Key] = myNumber */
@@ -39,8 +43,8 @@ namespace Gui {
     
     void GuiElement::onEvent(const char* event)
     {
-    	//printf("%s\n",event);
-        //GuiElement* pthis = *static_cast<GuiElement**>(luaL_checkudata(m_lua, 1, lua_metatableName));
+        Script::LuaEngine* engine = Script::LuaEngine::getThisPointer(m_lua);
+
         lua_pushlightuserdata(m_lua, (void *)this);  /* push address */
         lua_gettable(m_lua, LUA_REGISTRYINDEX);  /* retrieve value */
         lua_pushfstring(m_lua,event);
@@ -49,7 +53,7 @@ namespace Gui {
         if(lua_isfunction(m_lua,-1))
         {
             pushToStack();
-            m_engine->doPCall(1,0);
+            engine->doPCall(1,0);
         }
     }
 

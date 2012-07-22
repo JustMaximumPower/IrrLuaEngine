@@ -20,64 +20,73 @@
 * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ******************************************************************************/
-#ifndef GAME_H_
-#define GAME_H_
+#ifndef GUI_GUIPLUGIN_h
+#define GUI_GUIPLUGIN_h
 
-#include <lua.hpp>
-#include <irrlicht.h>
+#include "lua.hpp"
+#include "GuiElement.h"
 #include "ILuaEnginePlugin.h"
+#include "IrrlichtDevice.h"
 
-namespace Script
+class Game;
+
+namespace Gui
 {
-    class LuaEngine;
+    class GuiElement;
 }
 
-
-class Game : public Script::ILuaEnginePlugin
+namespace Gui
 {
-public:
+    class GuiPlugin : public Script::ILuaEnginePlugin
+    {
+    public:
 
-	Game();
+        GuiPlugin(irr::IrrlichtDevice* irr);
 
-	virtual ~Game();
+        void init();
 
-	void init(int argc, const char* argv[]);
+        void draw();
 
-	int runGame();
+        void runFile(const irr::core::stringc& file);
+        
+        virtual void run();
 
-	void closeGame();
+        int getFreeId(Gui::GuiElement* e);
 
-	irr::IrrlichtDevice* getIrrlichtDevice() const;
+        void freeElement(int i);
 
-	irr::video::IVideoDriver* getVideoDriver() const;
+        int doPCall(int args,int rets);
 
-    static Game* getThisPointer(lua_State* pLua);
+        irr::IrrlichtDevice* getIrrlichtDevice();
 
-    virtual void registerFunktions(lua_State* pLua);
+        virtual bool OnEvent(const irr::SEvent&);
 
-    virtual void run();
+        virtual void registerFunktions(lua_State* pLua);
+        
+        Gui::GuiElement* getElement(int id);
 
-    virtual bool OnEvent(const irr::SEvent&);
+        static GuiPlugin* getThisPointer(lua_State* pLua);
 
-    //---- Lua funktions ------
+        //---- Lua funktions ------
 
-    static int lua_ExitGame(lua_State* pLua);
 
-    //---- Lua Constants ------
+        //---- Lua Constants ------
 
-    static const char * lua_libName ;
+        static const luaL_reg lua_globls [];
 
-    static const luaL_reg lua_lib [];
+        static const char* Lua_Object_Key;
 
-    static const char* Lua_Object_Key;
 
-private:
+    protected:
 
-    Script::LuaEngine* m_script;
+        lua_State*           m_lua;
+        irr::IrrlichtDevice* m_device; 
 
-	irr::IrrlichtDevice* m_device;
+    private:
+        irr::core::array<Gui::GuiElement*>
+                            m_elements;
 
-	irr::video::IVideoDriver* m_driver;
-};
+    };
+}
 
-#endif /* GAME_H_ */
+#endif

@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (C) 2012 Moritz K�hner, Germany.
+* Copyright (C) 2012 Moritz Kühner, Germany.
 *
 * Permission is hereby granted, free of charge, to any person obtaining
 * a copy of this software and associated documentation files (the
@@ -20,38 +20,17 @@
 * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ******************************************************************************/
-#ifndef GUI_TestcaseEngine_h
-#define GUI_TestcaseEngine_h
+#ifndef GUI_LUAFUNCTIONS_h
+#define GUI_LUAFUNCTIONS_h
 
+struct lua_State;
 
-
-#include "LuaEngine.h"
-
-class Game;
-
-
-class TestcaseEngine : public Script::LuaEngine
+namespace Script
 {
 
-public:
-    TestcaseEngine(irr::IrrlichtDevice* irr, Game* g);
+	void savePointer(lua_State* const char* key,void* pointer);
+	
+	void* restorePointer(lua_State* const char* key);
+}
 
-    virtual const luaL_reg* getGlobals();
-
-    virtual void addLibraries();
-
-    //---- Lua funktions ------
-
-    static int lua_ExitGame(lua_State* pLua);
-
-    //---- Lua Constants ------
-
-    static const char * lua_libName ;
-
-    static const luaL_reg lua_lib [];
-    
-private:
-    Game* m_game;
-};
-   
-#endif 
+#endif

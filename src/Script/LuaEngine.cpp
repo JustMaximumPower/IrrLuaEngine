@@ -1,8 +1,8 @@
 #include "LuaEngine.h"
 #include "IrrlichtDevice.h"
 #include "IGUIEnvironment.h"
-#include "GuiButton.h"
-#include "GuiWidget.h"
+#include "ILuaEnginePlugin.h"
+
 
 namespace Script 
 {
@@ -12,7 +12,7 @@ namespace Script
         {NULL, NULL}  /* sentinel */
     };
 
-    static const char* engineKey = "engineKey";
+    const char* LuaEngine::Lua_Object_Key = "engineKey";
 
 
     LuaEngine::LuaEngine(irr::IrrlichtDevice* irr)
@@ -27,7 +27,7 @@ namespace Script
         m_errorhandler = lua_gettop(m_lua);
 
         /* store a number */
-        lua_pushlightuserdata(m_lua, (void *)&engineKey);  /* push address */
+        lua_pushlightuserdata(m_lua, (void *)Lua_Object_Key);  /* push address */
         lua_pushlightuserdata(m_lua, (void *)this);  /* push value */
         /* registry[&Key] = myNumber */
         lua_settable(m_lua, LUA_REGISTRYINDEX);
@@ -43,13 +43,20 @@ namespace Script
 
     }
 
-    template<class T>
-    T* LuaEngine::getThisPointer(lua_State* pLua)
+    void LuaEngine::addPlugin(ILuaEnginePlugin* p)
     {
-        lua_pushlightuserdata(pLua, (void *)&engineKey);  /* push address */
-        lua_gettable(pLua, LUA_REGISTRYINDEX);  /* retrieve value */
-        return (T*)lua_touserdata(pLua,-1);
+        m_plugins.push_back(p);
     }
+
+    LuaEngine* LuaEngine::getThisPointer(lua_State* pLua)
+    {
+        lua_pushlightuserdata(pLua, (void *)Lua_Object_Key);  /* push address */
+        lua_gettable(pLua, LUA_REGISTRYINDEX);  /* retrieve value */
+        LuaEngine* e = (LuaEngine*)lua_touserdata(pLua,-1);
+        lua_pop(pLua,1);
+        return e;
+    }
+
 
     void LuaEngine::runFile(const irr::core::stringc& file)
     {
@@ -64,24 +71,13 @@ namespace Script
 
         luaL_register(m_lua, NULL, lua_globls);
 
-        luaL_register(m_lua, NULL, getGlobals());
-
-        addLibraries();
-
-        Gui::GuiButton::createMatatable(m_lua);
-        Gui::GuiWidget::createMatatable(m_lua);
+        for(irr::u32 i = 0; i< m_plugins.size(); i++)
+        {
+            m_plugins[i]->registerFunktions(m_lua);
+        }
     }
 
-    int LuaEngine::getFreeId(Gui::GuiElement* e)
-    {
-        m_elements.push_back(e);
-        return m_elements.size();
-    }
 
-    void LuaEngine::freeElement(int i)
-    {
-        m_elements[i-1] = NULL;
-    }
 
     int LuaEngine::doPCall(int args,int rets)
     {
@@ -102,56 +98,20 @@ namespace Script
 
     bool LuaEngine::OnEvent(const irr::SEvent& e)
     {
-        if(e.EventType == irr::EET_GUI_EVENT)
+        for(irr::u32 i = 0; i < m_plugins.size(); i++)
         {
-            if(e.GUIEvent.Caller)
-    	    {
-			    int id = e.GUIEvent.Caller->getID();
-                Gui::GuiElement* element = getElement(id);
-                if(element)
-			    {
-				    switch(e.GUIEvent.EventType)
-				    {
-
-                    case irr::gui::EGET_BUTTON_CLICKED:
-							    element->onEvent("onButton");
-						    break;
-                        
-                    case irr::gui::EGET_ELEMENT_HOVERED:
-							    element->onEvent("onHover");
-						    break;
-
-                    case irr::gui::EGET_ELEMENT_FOCUSED:
-							    element->onEvent("onFocused");
-						    break;
-                    
-                    case irr::gui::EGET_ELEMENT_FOCUS_LOST:
-							    element->onEvent("onFocusLost");
-						    break;
-
-				    }
-			    }
-    	    }
+            m_plugins[i]->OnEvent(e);
         }
-		return false;
+        return false;
     }
 
 
     int LuaEngine::lua_Suspend(lua_State* pLua)
     {
-        LuaEngine* pthis = getThisPointer<LuaEngine>(pLua);
+        LuaEngine* pthis = getThisPointer(pLua);
         
 
         return 0;
-    }
-
-    Gui::GuiElement* LuaEngine::getElement(int id)
-    {
-        if(id > 0 && id <= (int) m_elements.size() && m_elements[id-1])
-	    {
-            return m_elements[id-1];
-        }
-        return NULL;
     }
 
 }

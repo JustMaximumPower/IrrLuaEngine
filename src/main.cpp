@@ -36,7 +36,7 @@ int main(int argc, const char* argv[])
 
 		game->init(argc, argv);
 
-		int ret = game->run();
+		int ret = game->runGame();
 
 		delete game;
 

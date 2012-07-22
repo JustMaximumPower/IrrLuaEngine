@@ -24,15 +24,14 @@
 #define GUI_CLIENTLUAENGINE_h
 
 #include "lua.hpp"
-#include "GuiElement.h"
 #include "IEventReceiver.h"
 #include "IrrlichtDevice.h"
 
 class Game;
 
-namespace Gui
+namespace Script
 {
-    class GuiElement;
+    class ILuaEnginePlugin;
 }
 
 namespace Script
@@ -49,27 +48,23 @@ namespace Script
         void draw();
 
         void runFile(const irr::core::stringc& file);
-
-        virtual const luaL_reg* getGlobals() = 0;
-
-        virtual void addLibraries() = 0;
         
         void run();
-
-        int getFreeId(Gui::GuiElement* e);
-
-        void freeElement(int i);
 
         int doPCall(int args,int rets);
 
         irr::IrrlichtDevice* getIrrlichtDevice();
 
-        template<class T>
-        static T* getThisPointer(lua_State* pLua);
+        static LuaEngine* getThisPointer(lua_State* pLua);
 
         virtual bool OnEvent(const irr::SEvent&);
-        
-        Gui::GuiElement* getElement(int id);
+
+        void addPlugin(ILuaEnginePlugin* p);
+
+        lua_State* getLuaState() const
+        {
+            return m_lua;
+        }
 
         //---- Lua funktions ------
 
@@ -79,8 +74,8 @@ namespace Script
 
         static const luaL_reg lua_globls [];
 
+        static const char* Lua_Object_Key;
 
-        
 
     protected:
 
@@ -89,8 +84,7 @@ namespace Script
 
 
     private:
-        irr::core::array<Gui::GuiElement*>
-                            m_elements;
+        irr::core::array<ILuaEnginePlugin*> m_plugins;
         int         m_errorhandler;
 
     };

@@ -20,64 +20,26 @@
 * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ******************************************************************************/
-#ifndef GAME_H_
-#define GAME_H_
+#ifndef GUI_ITLUAENGINEPLUGIN_h
+#define GUI_ITLUAENGINEPLUGIN_h
 
-#include <lua.hpp>
-#include <irrlicht.h>
-#include "ILuaEnginePlugin.h"
+#include "IEventReceiver.h"
+
+struct lua_State;
 
 namespace Script
 {
-    class LuaEngine;
+
+    class ILuaEnginePlugin : public irr::IEventReceiver
+    {
+    public:
+
+        virtual void registerFunktions(lua_State* pLua) = 0;
+
+        virtual void run() = 0;
+
+        virtual bool OnEvent(const irr::SEvent&) = 0;
+    };
 }
 
-
-class Game : public Script::ILuaEnginePlugin
-{
-public:
-
-	Game();
-
-	virtual ~Game();
-
-	void init(int argc, const char* argv[]);
-
-	int runGame();
-
-	void closeGame();
-
-	irr::IrrlichtDevice* getIrrlichtDevice() const;
-
-	irr::video::IVideoDriver* getVideoDriver() const;
-
-    static Game* getThisPointer(lua_State* pLua);
-
-    virtual void registerFunktions(lua_State* pLua);
-
-    virtual void run();
-
-    virtual bool OnEvent(const irr::SEvent&);
-
-    //---- Lua funktions ------
-
-    static int lua_ExitGame(lua_State* pLua);
-
-    //---- Lua Constants ------
-
-    static const char * lua_libName ;
-
-    static const luaL_reg lua_lib [];
-
-    static const char* Lua_Object_Key;
-
-private:
-
-    Script::LuaEngine* m_script;
-
-	irr::IrrlichtDevice* m_device;
-
-	irr::video::IVideoDriver* m_driver;
-};
-
-#endif /* GAME_H_ */
+#endif

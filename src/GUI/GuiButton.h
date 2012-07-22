@@ -45,7 +45,7 @@ namespace Gui
 
         static void createMatatable(lua_State* pLua);
 
-        GuiButton(Script::LuaEngine* engine, lua_State* plua);
+        GuiButton(GuiPlugin* plugin, lua_State* plua);
 
         ~GuiButton();
 

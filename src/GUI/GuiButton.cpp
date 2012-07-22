@@ -2,6 +2,7 @@
 #include "LuaEngine.h"
 #include "IrrlichtDevice.h"
 #include "IGUIEnvironment.h"
+#include "GuiPlugin.h"
 
 
 namespace Gui {
@@ -31,7 +32,7 @@ namespace Gui {
     }
 
 
-    GuiButton::GuiButton(Script::LuaEngine* engine, lua_State* plua):GuiElement(engine,plua)
+    GuiButton::GuiButton(GuiPlugin* plugin, lua_State* plua):GuiElement(plugin, plua)
     {
         m_irrElement = NULL;
         m_type = lua_metatableName;
@@ -80,8 +81,9 @@ namespace Gui {
 
     int GuiButton::lua_new(lua_State* pLua)
     {
-        Script::LuaEngine* engine = Script::LuaEngine::getThisPointer<Script::LuaEngine>(pLua);
-        GuiButton* pthis = new GuiButton(engine,pLua);
+        GuiPlugin* plugin = GuiPlugin::getThisPointer(pLua);
+        Script::LuaEngine* engine = Script::LuaEngine::getThisPointer(pLua);
+        GuiButton* pthis = new GuiButton(plugin,pLua);
 
         pthis->pushToStack();
 

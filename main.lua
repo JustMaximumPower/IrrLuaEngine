@@ -1,8 +1,7 @@
 
 
-
 function createButton(w,x,y)
-	btn = Button.new(x,y,100,100,"0","")
+	btn = Button.new(x,y+25,100,100,"0","")
 
 	btn.test = 0
 
@@ -23,22 +22,25 @@ function createButton(w,x,y)
 end
 
 
-print("lua loaded")
 
-w = Widget.new(100,100,500,200,"Hi")
+function createWindow(k)
+	w = Widget.new(100,100,k*100,k*100+25,"Hi")
+	w.onWindowClose = function(this)
+		window = createWindow(3)
+		collectgarbage()
+	end
+	
+	for i=0, k-1 do
+		for y=0, k-1 do
+			createButton(w,y*100,i*100)
+		end
+	end
+end
+
+window = createWindow(3)
 
 suspend()
 
-buttons = {}
-
-for i=0, 3 do
-	buttons[i] = {}
-	for y=0, 3 do
-		buttons[i][y] = createButton(w,y*100,i*100)
-	end
-	
-end
-
-
+print("lua loaded")
 
 collectgarbage()

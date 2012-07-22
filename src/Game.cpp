@@ -1,9 +1,19 @@
 #include "Game.h"
 #include <fstream>
 #include <time.h>
-#include "TestcaseEngine.h"
+#include "GuiPlugin.h"
+#include "LuaEngine.h"
 
 using namespace irr;
+
+const char* Game::Lua_Object_Key = "GameKey";
+
+const char* Game::lua_libName = "Game";
+
+const luaL_reg Game::lua_lib[] = {
+        {"exit",lua_ExitGame},
+        {NULL, NULL}  /* sentinel */
+    };
 
 Game::Game()
 {
@@ -34,7 +44,7 @@ void Game::init(int argc, const char* argv[])
 
 	//assert(m_device != NULL);
 
-	m_device->setWindowCaption(L"LuaGuiEngine Test");
+	m_device->setWindowCaption(L"LuaEngine Test");
 
 	irr::gui::IGUIFont* font = m_device->getGUIEnvironment()->getFont(
 			"font.xml");
@@ -42,14 +52,24 @@ void Game::init(int argc, const char* argv[])
 	skin->setFont(font);
 	m_device->getGUIEnvironment()->setSkin(skin);
 
-    m_script = new TestcaseEngine(m_device,this);
+    m_script = new Script::LuaEngine(m_device);
+    
+
+        /* store a number */
+    lua_pushlightuserdata(m_script->getLuaState(), (void *)Lua_Object_Key);  /* push address */
+    lua_pushlightuserdata(m_script->getLuaState(), (void *)this);  /* push value */
+    /* registry[&Key] = myNumber */
+    lua_settable(m_script->getLuaState(), LUA_REGISTRYINDEX);
+
+    m_script->addPlugin(new Gui::GuiPlugin(m_device));
+
     m_script->init();
     m_script->runFile("main.lua");
 
 	m_device->setEventReceiver(m_script);
 }
 
-int Game::run()
+int Game::runGame()
 {
 	while (m_device->run())
 	{
@@ -79,4 +99,42 @@ irr::video::IVideoDriver* Game::getVideoDriver() const
 	return m_driver;
 }
 
+int Game::lua_ExitGame(lua_State* pLua)
+{
+    Game* pthis = getThisPointer(pLua);
+        
+    pthis->closeGame();
+
+    return 0;
+}
+
+Game* Game::getThisPointer(lua_State* pLua)
+{
+    lua_pushlightuserdata(pLua, (void *)Lua_Object_Key);  /* push address */
+    lua_gettable(pLua, LUA_REGISTRYINDEX);  /* retrieve value */
+    Game* e = (Game*)lua_touserdata(pLua,-1);
+    lua_pop(pLua,1);
+    return e;
+}
+
+void Game::registerFunktions(lua_State* pLua)
+{
+    luaL_register(pLua, lua_libName, lua_lib);
+    
+    /* store a number */
+    lua_pushlightuserdata(pLua, (void *)Lua_Object_Key);  /* push address */
+    lua_pushlightuserdata(pLua, (void *)this);  /* push value */
+    /* registry[&Key] = myNumber */
+    lua_settable(pLua, LUA_REGISTRYINDEX);
+}
+
+void Game::run()
+{
+
+}
+
+bool Game::OnEvent(const irr::SEvent&)
+{
+    return false;
+}
 

@@ -23,15 +23,13 @@
 #ifndef Main_UserInterface_GuiElement_h
 #define Main_UserInterface_GuiElement_h
 
-
 #include <IGUIElement.h>
 #include <lua.hpp>
 
 
-
-namespace Script 
-{   
-    class LuaEngine;
+namespace Gui 
+{
+    class GuiPlugin;
 } 
 
 namespace Gui 
@@ -42,7 +40,7 @@ namespace Gui
 
     public:
 
-        GuiElement(Script::LuaEngine* engine, lua_State* plua);
+        GuiElement(GuiPlugin* plugin, lua_State* plua);
 
         ~GuiElement();
 
@@ -70,14 +68,17 @@ namespace Gui
     protected:
 
         void onLuaGC();
+
         void onLuaIndex();
+
         void onLuaNewIndex();
 
         GuiElement *m_parent;
 
         lua_State*  m_lua;
 
-        Script::LuaEngine* m_engine;
+        GuiPlugin* m_plugin;
+
         const char* m_type;
 
     private:
