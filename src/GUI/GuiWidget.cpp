@@ -4,6 +4,7 @@
 #include "IrrlichtDevice.h"
 #include "IGUIEnvironment.h"
 #include "GuiButton.h"
+#include "IGUIElement.h"
 
 
 
@@ -48,7 +49,6 @@ namespace Gui
 
         for(irr::u32 i = 0; i < m_children.size(); i++)
         {
-            m_irrElement->removeChild(m_children[i]->getIrrlichtElement());
             m_children[i]->drop();
         }
         m_children.clear();
@@ -56,7 +56,11 @@ namespace Gui
 
         if(m_irrElement)
         {
-            m_irrElement->drop();
+/*            Script::LuaEngine* engine = Script::LuaEngine::getThisPointer(m_lua);
+            engine->getIrrlichtDevice()->getGUIEnvironment()->getRootGUIElement()->removeChild(m_irrElement);
+  */          
+            m_irrElement->remove();
+            //m_irrElement->drop();
             m_irrElement = NULL;
         }
     }

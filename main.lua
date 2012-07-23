@@ -15,8 +15,10 @@ function createButton(w,x,y)
 		this.text = this.test
 
 	end
-
-	w:addElement(btn)
+	
+	if w then
+		w:addElement(btn)
+	end
 	
 	return btn
 end
@@ -24,10 +26,9 @@ end
 
 
 function createWindow(k)
-	w = Widget.new(100,100,k*100,k*100+25,"Hi")
+	w = Widget.new(100,100,k*100+10,k*100+25,"Hi")
 	w.onWindowClose = function(this)
-		window = createWindow(3)
-		collectgarbage()
+		print("close")
 	end
 	
 	for i=0, k-1 do
@@ -37,10 +38,21 @@ function createWindow(k)
 	end
 end
 
-window = createWindow(3)
+open = Button.new(100,10,100,100,"Open","")
 
-suspend()
+function open:onButton() 
+	window = createWindow(2)
+end
+
+dogc = Button.new(210,10,100,100,"Do GC","")
+
+function dogc:onButton() 
+
+	collectgarbage("collect")
+end
+
+
 
 print("lua loaded")
 
-collectgarbage()
+collectgarbage("collect")

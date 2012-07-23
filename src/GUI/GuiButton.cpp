@@ -43,7 +43,7 @@ namespace Gui {
         printf("GuiButton::~GuiButton\n");
         if(m_irrElement)
         {
-            m_irrElement->drop();
+            m_irrElement->remove();
             m_irrElement = NULL;
         }
     }
