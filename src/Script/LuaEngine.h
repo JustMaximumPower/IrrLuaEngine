@@ -51,7 +51,7 @@ namespace Script
         
         void run();
 
-        int doPCall(int args,int rets);
+        int doCall(int args,int rets);
 
         irr::IrrlichtDevice* getIrrlichtDevice();
 

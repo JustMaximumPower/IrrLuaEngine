@@ -62,7 +62,7 @@ namespace Script
     {
         luaL_loadfile(m_lua,file.c_str());
    
-        doPCall(0,0);
+        doCall(0,0);
     }
 
     void LuaEngine::init()
@@ -79,9 +79,36 @@ namespace Script
 
 
 
-    int LuaEngine::doPCall(int args,int rets)
+    int LuaEngine::doCall(int args,int rets)
     {
-        int error = lua_pcall(m_lua, args, rets, m_errorhandler);
+        int function_index = lua_gettop(m_lua) - args;
+        lua_getfield(m_lua,LUA_GLOBALSINDEX,"coroutine");
+        lua_getfield(m_lua,-1,"create");
+        lua_remove(m_lua, -2);
+
+        lua_pushvalue(m_lua,function_index);
+        //lua_remove(m_lua,function_index);
+
+        int error = lua_pcall(m_lua, 1, 1, m_errorhandler);
+
+
+
+        if(error)
+        {
+            const char* c = lua_tostring(m_lua, -1);
+            printf("Error in runing Script! %i: \n%s\n", error, c);
+            return error;
+        }
+
+        //lua_insert(m_lua, function_index);
+        //error = lua_resume(m_lua, args);
+
+        lua_getfield(m_lua,LUA_GLOBALSINDEX,"coroutine");
+        lua_getfield(m_lua,-1,"resume");
+        lua_remove(m_lua, -2);
+        lua_insert(m_lua, function_index);
+
+        error = lua_pcall(m_lua, args+1, rets, m_errorhandler);
 
         if(error)
         {

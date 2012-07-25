@@ -36,8 +36,9 @@ namespace Gui
     {
         GuiElement** otherThis = (GuiElement**)lua_newuserdata(m_lua,sizeof(void*));
         *otherThis = this;
+        int index = lua_gettop(m_lua);
         luaL_getmetatable(m_lua, getMetaTableName());
-        lua_setmetatable(m_lua, -2);
+        lua_setmetatable(m_lua, index);
         grab();
     }
     
@@ -53,7 +54,7 @@ namespace Gui
         if(lua_isfunction(m_lua,-1))
         {
             pushToStack();
-            engine->doPCall(1,0);
+            engine->doCall(1,0);
         }
     }
 
