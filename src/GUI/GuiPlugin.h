@@ -55,8 +55,6 @@ namespace Gui
 
         void freeElement(int i);
 
-        int doPCall(int args,int rets);
-
         irr::IrrlichtDevice* getIrrlichtDevice();
 
         virtual bool OnEvent(const irr::SEvent&);
