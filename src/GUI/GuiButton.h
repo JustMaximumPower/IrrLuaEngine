@@ -42,47 +42,23 @@ namespace Gui
     {
 
      public:
-
-        static void createMatatable(lua_State* pLua);
-
-        GuiButton(GuiPlugin* plugin, lua_State* plua);
+        GuiButton(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua);
 
         ~GuiButton();
-
-        virtual void draw();
-
-        virtual const luaL_reg* getMethods();
-        
-        virtual const luaL_reg* getFunktions();
-
-        virtual const char* getTableName();
-
-        virtual const char* getMetaTableName();
-
-        virtual irr::gui::IGUIElement* getIrrlichtElement();
 
         //---- Lua funktions ------
 
         static int lua_new(lua_State* pLua);
 
-        static int lua_GC(lua_State* pLua);
-
-        static int lua_index(lua_State* pLua);
-
-        static int lua_newindex(lua_State* pLua);
-
         //---- Lua Constants ------
 
         static const char* lua_libName;
-
-        static const char* lua_metatableName;
 
         static const struct luaL_reg lua_lib_m [];
 
         static const struct luaL_reg lua_lib_f [];
 
-    protected:
-        irr::gui::IGUIButton *m_irrElement;
+
     };
 
 }

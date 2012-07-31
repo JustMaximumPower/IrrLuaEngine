@@ -1,4 +1,5 @@
 #include "LuaEngine.h"
+#include "LuaObject.h"
 #include "IrrlichtDevice.h"
 #include "IGUIEnvironment.h"
 #include "ILuaEnginePlugin.h"
@@ -7,7 +8,8 @@
 namespace Script 
 {
 
-    const struct luaL_reg LuaEngine::lua_globls [] = {
+    const struct luaL_reg LuaEngine::lua_globls [] = 
+    {
         {"suspend", lua_Suspend},
         {NULL, NULL}  /* sentinel */
     };
@@ -21,6 +23,7 @@ namespace Script
         m_lua = lua_open();
         luaL_openlibs(m_lua);
 
+        lua_atpanic(m_lua, lua_AtPanic);
 
         lua_getglobal(m_lua,"debug");
         lua_getfield(m_lua,-1,"traceback");
@@ -31,11 +34,9 @@ namespace Script
         lua_pushlightuserdata(m_lua, (void *)this);  /* push value */
         /* registry[&Key] = myNumber */
         lua_settable(m_lua, LUA_REGISTRYINDEX);
-    }
 
-    void LuaEngine::draw()
-    {
-        m_device->getGUIEnvironment()->drawAll();
+        luaL_newmetatable(m_lua, LuaObject::Lua_Object_Metatable);
+        luaL_openlib(m_lua, NULL, LuaObject::s_methods, 0);
     }
 
     void LuaEngine::run()
@@ -62,7 +63,13 @@ namespace Script
     {
         luaL_loadfile(m_lua,file.c_str());
    
-        doCall(0,0);
+        int error = lua_pcall(m_lua, 0, 0, m_errorhandler);
+
+        if(error)
+        {
+            const char* c = lua_tostring(m_lua, -1);
+            printf("Error in runing Script! %i: \n%s\n", error, c);
+        }
     }
 
     void LuaEngine::init()
@@ -81,40 +88,33 @@ namespace Script
 
     int LuaEngine::doCall(int args,int rets)
     {
-        int function_index = lua_gettop(m_lua) - args;
-        lua_getfield(m_lua,LUA_GLOBALSINDEX,"coroutine");
-        lua_getfield(m_lua,-1,"create");
-        lua_remove(m_lua, -2);
+        YieldState state;
+        state.m_thread = lua_newthread(m_lua);
+        state.m_refkey = luaL_ref(m_lua,LUA_REGISTRYINDEX);
 
-        lua_pushvalue(m_lua,function_index);
-        //lua_remove(m_lua,function_index);
+        int t = lua_status(state.m_thread);
 
-        int error = lua_pcall(m_lua, 1, 1, m_errorhandler);
+        //lua_getglobal(state.m_thread,"debug");
+        //lua_getfield(state.m_thread,-1,"traceback");
 
+        lua_xmove(m_lua,state.m_thread,args+1);
 
+        //stackdump(state.m_thread);
 
-        if(error)
+        //stackdump(m_lua);
+
+        t = lua_status(state.m_thread);
+
+        //int error = lua_pcall(state.m_thread, args,0,2);
+
+        int error = lua_resume(state.m_thread, args);
+
+        if(error && error != LUA_YIELD)
         {
-            const char* c = lua_tostring(m_lua, -1);
-            printf("Error in runing Script! %i: \n%s\n", error, c);
-            return error;
-        }
-
-        //lua_insert(m_lua, function_index);
-        //error = lua_resume(m_lua, args);
-
-        lua_getfield(m_lua,LUA_GLOBALSINDEX,"coroutine");
-        lua_getfield(m_lua,-1,"resume");
-        lua_remove(m_lua, -2);
-        lua_insert(m_lua, function_index);
-
-        error = lua_pcall(m_lua, args+1, rets, m_errorhandler);
-
-        if(error)
-        {
-            const char* c = lua_tostring(m_lua, -1);
+            const char* c = lua_tostring(state.m_thread, -1);
             printf("Error in runing Script! %i: \n%s\n", error, c);
         }
+
         return error;
     }
 
@@ -140,5 +140,43 @@ namespace Script
 
         return 0;
     }
+
+    int LuaEngine::lua_AtPanic(lua_State* pLua)
+    {
+        const char* c = lua_tostring(pLua, -1);
+        printf("Master VM Panic! This is facemelt: \n%s\n", c);
+        stackdump(pLua);
+        return 0;
+    }
+
+    void LuaEngine::stackdump(lua_State* l)
+    {
+        int i;
+        int top = lua_gettop(l);
+
+        printf("total in stack %d\n",top);
+
+        for (i = 1; i <= top; i++)
+        {  /* repeat for each level */
+            int t = lua_type(l, i);
+            switch (t) {
+                case LUA_TSTRING:  /* strings */
+                    printf("string: '%s'\n", lua_tostring(l, i));
+                    break;
+                case LUA_TBOOLEAN:  /* booleans */
+                    printf("boolean %s\n",lua_toboolean(l, i) ? "true" : "false");
+                    break;
+                case LUA_TNUMBER:  /* numbers */
+                    printf("number: %g\n", lua_tonumber(l, i));
+                    break;
+                default:  /* other values */
+                    printf("%s\n", lua_typename(l, t));
+                    break;
+            }
+            printf("  ");  /* put a separator */
+        }
+        printf("\n");  /* end the listing */
+    }
+
 
 }

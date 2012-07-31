@@ -1,99 +1,201 @@
 #include "GuiElement.h"
 #include "LuaEngine.h"
 #include "GuiPlugin.h"
+#include "IrrlichtDevice.h"
+#include "IGUIEnvironment.h"
+#include "GuiButton.h"
+#include "IGUIElement.h"
 
 
 namespace Gui 
 {
+    const struct luaL_reg GuiElement::lua_lib_m [] = {
+        {"remove",lua_remove},
+        {NULL, NULL}  /* sentinel */
+    };
 
+    const struct luaL_reg GuiElement::lua_lib_p [] = {
+        {"toolTip",lua_toolTip},
+        {"text",lua_text},
+        {"enabled",lua_enabled},
+        {"visible",lua_visible},
+        {NULL, NULL}  /* sentinel */
+    };
 
-    GuiElement::GuiElement(GuiPlugin* plugin, lua_State* plua)
+    GuiElement::GuiElement(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua):Script::LuaObject(engine,plua)
     {
         m_plugin = plugin;
         m_parent = NULL;
-        m_type = "";
-        m_lua = plua;
 
         m_id = m_plugin->getFreeId(this);
-        lua_pushlightuserdata(m_lua, (void *)this);  /* push value */
-        lua_newtable(m_lua);
-        /* registry[&Key] = myNumber */
-        lua_settable(m_lua, LUA_REGISTRYINDEX);
-    }
 
+        const struct luaL_reg* i = lua_lib_m;
+
+        while(i->func && i->name)
+        {
+            addMethod(i->name,i->func);
+            i++;
+        }
+
+        i = lua_lib_p;
+        while(i->func && i->name)
+        {
+            addProperty(i->name,i->func);
+            i++;
+        }
+
+    }
     
     GuiElement::~GuiElement()
     {
-        m_plugin->freeElement(m_id);
+        printf("GuiElement::~GuiElement\n");
 
-        lua_pushlightuserdata(m_lua, (void *)this);  /* push value */
-        lua_pushnil(m_lua);
-        /* registry[&Key] = myNumber */
-        lua_settable(m_lua, LUA_REGISTRYINDEX);
-    }
-    
-    void GuiElement::pushToStack()
-    {
-        GuiElement** otherThis = (GuiElement**)lua_newuserdata(m_lua,sizeof(void*));
-        *otherThis = this;
-        int index = lua_gettop(m_lua);
-        luaL_getmetatable(m_lua, getMetaTableName());
-        lua_setmetatable(m_lua, index);
-        grab();
-    }
-    
-    void GuiElement::onEvent(const char* event)
-    {
-        Script::LuaEngine* engine = Script::LuaEngine::getThisPointer(m_lua);
-
-        lua_pushlightuserdata(m_lua, (void *)this);  /* push address */
-        lua_gettable(m_lua, LUA_REGISTRYINDEX);  /* retrieve value */
-        lua_pushfstring(m_lua,event);
-        lua_gettable(m_lua, -2);
-
-        if(lua_isfunction(m_lua,-1))
+        //------- <debug code> 
+        irr::gui::IGUIElement* e = m_engine->getIrrlichtDevice()->getGUIEnvironment()->
+            getRootGUIElement()->getElementFromId(getId());
+        
+        if(e != m_irrelement)
         {
-            pushToStack();
-            engine->doCall(1,0);
-        }
-    }
-
-    void GuiElement::onLuaGC()
-    {
-        drop();
-    }
-
-    void GuiElement::onLuaIndex()
-    {
-        const char* key = luaL_checkstring(m_lua, 2);
-
-        if(!strcmp("type",key))
-        {
-            lua_pushstring(m_lua,m_type);
+            printf("woooot!!!!\n");
             return;
         }
 
-        lua_getmetatable(m_lua, 1);
-        lua_getfield(m_lua, -1, key);
+        //------- </debug code> 
+       
 
-        if(!lua_isnil(m_lua, -1))
-	        return;
-
-        lua_settop(m_lua, 2);
-
-        lua_pushlightuserdata(m_lua, (void *)this);  /* push address */
-        lua_gettable(m_lua, LUA_REGISTRYINDEX);  /* retrieve value */
-        lua_insert(m_lua,2);
-        lua_gettable(m_lua, 2);
+        if(m_irrelement)
+        {
+            m_irrelement->remove();
+            m_irrelement = NULL;
+        }
+        m_plugin->freeElement(m_id);
     }
 
-    void GuiElement::onLuaNewIndex()
+    const int GuiElement::getId() const
     {
-        lua_pushlightuserdata(m_lua, (void *)this);  /* push address */
-        lua_gettable(m_lua, LUA_REGISTRYINDEX);  /* retrieve value */
-        lua_insert(m_lua,2);
-        lua_settable(m_lua, 2);
+        return m_id;
     }
 
+    irr::gui::IGUIElement* GuiElement::getIrrlichtElement() const
+    {
+        return m_irrelement;
+    }
+
+    GuiElement* GuiElement::lua_toGuiElement(lua_State* pLua, int index)
+    {
+        GuiElement* pthis = dynamic_cast<GuiElement*>(Script::LuaObject::lua_toLuaObject(pLua, index));
+         
+        if(!pthis)
+        {
+            luaL_error(pLua,"Type missmatch for arg #%i",index);
+        }
+        return pthis;
+    }
+
+    int GuiElement::lua_remove(lua_State* pLua)
+    {
+         GuiElement* pthis = lua_toGuiElement(pLua);
+
+         if(pthis->m_irrelement)
+         {
+             pthis->m_irrelement->remove();
+             pthis->m_irrelement = NULL;
+         }
+         return 0;
+    }
+
+    int GuiElement::lua_toolTip(lua_State* pLua)
+    {
+         GuiElement* pthis = lua_toGuiElement(pLua);
+         const char* key = luaL_checkstring(pLua, 2);
+         
+         if(lua_gettop(pLua) == 2)
+         {
+            const irr::core::stringw& wtip = pthis->m_irrelement->getToolTipText();
+            char* tip = new char[wtip.size()+1];
+            wcstombs(tip,wtip.c_str(),wtip.size()+1);
+            lua_pushstring(pLua,tip);
+            delete tip;
+            return 1;
+         }
+         else
+         {
+            const char* text = luaL_checkstring(pLua, 3);
+            irr::core::stringw wtext(text);
+            pthis->m_irrelement->setToolTipText(wtext.c_str());
+
+            return 0;
+         }
+
+         return 0;
+    }
+
+    int GuiElement::lua_text(lua_State* pLua)
+    {
+         GuiElement* pthis = lua_toGuiElement(pLua);
+         const char* key = luaL_checkstring(pLua, 2);
+         
+         if(lua_gettop(pLua) == 2)
+         {
+            const irr::core::stringw& wtip = pthis->m_irrelement->getText();
+            char* tip = new char[wtip.size()+1];
+            wcstombs(tip,wtip.c_str(),wtip.size()+1);
+            lua_pushstring(pLua,tip);
+            delete tip;
+            return 1;
+         }
+         else
+         {
+            const char* text = luaL_checkstring(pLua, 3);
+            irr::core::stringw wtext(text);
+            pthis->m_irrelement->setText(wtext.c_str());
+
+            return 0;
+         }
+
+         return 0;
+    }
+
+    int GuiElement::lua_enabled(lua_State* pLua)
+    {
+         GuiElement* pthis = lua_toGuiElement(pLua);
+         const char* key = luaL_checkstring(pLua, 2);
+         
+         if(lua_gettop(pLua) == 2)
+         {
+            lua_pushboolean(pLua,pthis->m_irrelement->isEnabled());
+            return 1;
+         }
+         else
+         {
+            bool b = lua_toboolean(pLua,3) != 0;
+            pthis->m_irrelement->setEnabled(b);
+
+            return 0;
+         }
+
+         return 0;
+    }
+
+    int GuiElement::lua_visible(lua_State* pLua)
+    {
+         GuiElement* pthis = lua_toGuiElement(pLua);
+         const char* key = luaL_checkstring(pLua, 2);
+         
+         if(lua_gettop(pLua) == 2)
+         {
+            lua_pushboolean(pLua,pthis->m_irrelement->isVisible());
+            return 1;
+         }
+         else
+         {
+            bool b = lua_toboolean(pLua,3) != 0;
+            pthis->m_irrelement->setVisible(b);
+
+            return 0;
+         }
+
+         return 0;
+    }
 
 } /* End of namespace Gui */

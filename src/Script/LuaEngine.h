@@ -26,6 +26,7 @@
 #include "lua.hpp"
 #include "IEventReceiver.h"
 #include "IrrlichtDevice.h"
+#include <irrList.h>
 
 class Game;
 
@@ -36,6 +37,12 @@ namespace Script
 
 namespace Script
 {
+    class YieldState
+    {
+    public:
+        lua_State*  m_thread;
+        int         m_refkey; 
+    };
 
     class LuaEngine : public irr::IEventReceiver
     {
@@ -44,8 +51,6 @@ namespace Script
         LuaEngine(irr::IrrlichtDevice* irr);
 
         void init();
-
-        void draw();
 
         void runFile(const irr::core::stringc& file);
         
@@ -66,9 +71,13 @@ namespace Script
             return m_lua;
         }
 
+        static void stackdump(lua_State* l);
+
         //---- Lua funktions ------
 
         static int lua_Suspend(lua_State* pLua);
+
+        static int lua_AtPanic(lua_State* pLua);
 
         //---- Lua Constants ------
 
@@ -77,13 +86,11 @@ namespace Script
         static const char* Lua_Object_Key;
 
 
-    protected:
+    private:
+        irr::core::list<YieldState>  m_yieldlist;
 
         lua_State*           m_lua;
         irr::IrrlichtDevice* m_device; 
-
-
-    private:
         irr::core::array<ILuaEnginePlugin*> m_plugins;
         int         m_errorhandler;
 

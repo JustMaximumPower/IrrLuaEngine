@@ -117,8 +117,8 @@ namespace Gui
         /* registry[&Key] = myNumber */
         lua_settable(m_lua, LUA_REGISTRYINDEX);
 
-        Gui::GuiButton::createMatatable(m_lua);
-        Gui::GuiWidget::createMatatable(m_lua);
+        luaL_openlib(pLua, GuiButton::lua_libName, GuiButton::lua_lib_f, 0);
+        luaL_openlib(pLua, GuiWidget::lua_libName, GuiWidget::lua_lib_f, 0);
     }
 
 }

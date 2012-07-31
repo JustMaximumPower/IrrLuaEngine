@@ -25,6 +25,7 @@
 
 #include <IGUIElement.h>
 #include <lua.hpp>
+#include "LuaObject.h"
 
 
 namespace Gui 
@@ -35,55 +36,46 @@ namespace Gui
 namespace Gui 
 {
 
-    class GuiElement : public irr::IReferenceCounted 
+    class GuiElement : public Script::LuaObject 
     {
 
     public:
 
-        GuiElement(GuiPlugin* plugin, lua_State* plua);
+        GuiElement(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua);
 
         ~GuiElement();
 
-        virtual void draw() = 0;
+        irr::gui::IGUIElement* getIrrlichtElement() const;
 
-        virtual const luaL_reg* getMethods() = 0;
-        
-        virtual const luaL_reg* getFunktions() = 0;
-
-        virtual const char* getTableName() = 0;
-
-        virtual const char* getMetaTableName() = 0;
-
-        virtual irr::gui::IGUIElement* getIrrlichtElement() = 0;
-
-        void pushToStack();
-
-        void onEvent(const char* event);
-
-        const int getId() const
-        {
-            return m_id;
-        }
+        const int getId() const;
 
     protected:
 
-        void onLuaGC();
-
-        void onLuaIndex();
-
-        void onLuaNewIndex();
+        static GuiElement* lua_toGuiElement(lua_State* pLua, int index = 1);
 
         GuiElement *m_parent;
 
-        lua_State*  m_lua;
-
         GuiPlugin* m_plugin;
 
-        const char* m_type;
+        static int lua_remove(lua_State* pLua);
+
+        static int lua_toolTip(lua_State* pLua);
+
+        static int lua_text(lua_State* pLua);
+
+        static int lua_enabled(lua_State* pLua);
+
+        static int lua_visible(lua_State* pLua);
+
+        irr::gui::IGUIElement* m_irrelement;
 
     private:
-        
-        int m_id;
+        int         m_luaTableKey;
+        int         m_id;
+
+        static const struct luaL_reg lua_lib_m [];
+
+        static const struct luaL_reg lua_lib_p [];
     };
 
 } 

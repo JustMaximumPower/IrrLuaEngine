@@ -76,7 +76,7 @@ int Game::runGame()
         m_script->run();
 
 		m_driver->beginScene(true, true);
-        m_script->draw();
+        m_device->getGUIEnvironment()->drawAll();
 		m_driver->endScene();
 		m_device->yield();
 	}

@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (C) 2012 Moritz Kï¿½hner, Germany.
+* Copyright (C) 2012 Moritz Kühner, Germany.
 *
 * Permission is hereby granted, free of charge, to any person obtaining
 * a copy of this software and associated documentation files (the
@@ -20,52 +20,67 @@
 * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ******************************************************************************/
-#ifndef Main_UserInterface_GuiWidget_h
-#define Main_UserInterface_GuiWidget_h
+#ifndef LuaObject_h
+#define LuaObject_h
 
-
-#include "GuiElement.h"
 #include <lua.hpp>
-#include <IGUIWindow.h>
-
+#include <IReferenceCounted.h>
 
 namespace Script 
-{   
+{
     class LuaEngine;
 } 
 
-namespace Gui 
+namespace Script 
 {
 
-    class GuiWidget : public GuiElement
+    class LuaObject : public irr::IReferenceCounted 
     {
+    public:
 
-     public:
+        LuaObject(LuaEngine* engine, lua_State* plua);
 
-        GuiWidget(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua);
+        ~LuaObject();
 
-        ~GuiWidget();
+        void pushToStack(lua_State* plua);
 
-        //---- Lua funktions ------
+        void onEvent(const char* event);
 
-        static int lua_new(lua_State* pLua);
+        //----- Lua Constants ------
 
-        static int lua_addElement(lua_State* pLua);
+        static const char* Lua_Object_Metatable; 
 
-        //---- Lua Constants ------
-
-        static const char* lua_libName;
-
-        static const struct luaL_reg lua_lib_m [];
-
-        static const struct luaL_reg lua_lib_f [];
+        static const struct luaL_reg s_methods [];
 
     protected:
 
-        irr::core::array<GuiElement*> m_children;
+        static LuaObject* lua_toLuaObject(lua_State* pLua, int index = 1);
+
+        void addMethod(const char* name, lua_CFunction f);
+
+        void addProperty(const char* name, lua_CFunction f);
+
+        LuaEngine* m_engine;
+
+    private:
+
+        //----- Lua Funktions ------
+
+        static int lua_GC(lua_State* pLua);
+
+        static int lua_index(lua_State* pLua);
+
+        static int lua_newindex(lua_State* pLua);
+
+        int     m_luaTableKey;
+
+        lua_State* m_lua;
+
+        const char* m_type;
+
     };
 
-}
+} 
 
 
-#endif
+#endif 
