@@ -41,7 +41,14 @@ namespace Script
 
     void LuaEngine::run()
     {
+        irr::core::list<YieldState>  yieldlist = m_yieldlist;
+        m_yieldlist.clear();
 
+
+        for(irr::core::list<YieldState>::Iterator i = yieldlist.begin(); i != yieldlist.end();i++)
+        {
+            resumeState(*i);
+        }
     }
 
     void LuaEngine::addPlugin(ILuaEnginePlugin* p)
@@ -94,6 +101,58 @@ namespace Script
 
         lua_xmove(m_lua,state.m_thread,args+1);
         
+        return resumeState(state);
+    }
+
+    irr::IrrlichtDevice* LuaEngine::getIrrlichtDevice()
+    {
+        return m_device;
+    }
+
+    bool LuaEngine::OnEvent(const irr::SEvent& e)
+    {
+        for(irr::u32 i = 0; i < m_plugins.size(); i++)
+        {
+            m_plugins[i]->OnEvent(e);
+        }
+        return false;
+    }
+
+
+    int LuaEngine::lua_Suspend(lua_State* pLua)
+    {
+        if(lua_gettop(pLua) == 0)
+        {
+            lua_pushstring(pLua,"f");
+            lua_pushnumber(pLua,1);
+        }
+        else if(lua_gettop(pLua) == 1)
+        {
+            luaL_checknumber(pLua,1);
+            lua_pushstring(pLua,"g");
+            lua_insert(pLua,1);
+        }
+        else
+        {
+            luaL_checklstring(pLua,1,NULL);
+            luaL_checknumber(pLua,2);
+            lua_settop(pLua,2);
+        }
+        
+        return lua_yield(pLua,2);
+    }
+
+    int LuaEngine::lua_AtPanic(lua_State* pLua)
+    {
+        const char* c = lua_tostring(pLua, -1);
+        printf("Master VM Panic! This is facemelt: \n%s\n", c);
+        stackdump(pLua);
+        return 0;
+    }
+
+    int LuaEngine::resumeState(YieldState& state)
+    {
+        int args = lua_gettop(state.m_thread)-1;
         int error = lua_resume(state.m_thread, args);
 
         if(error && error != LUA_YIELD)
@@ -115,38 +174,6 @@ namespace Script
         luaL_unref(m_lua,LUA_REGISTRYINDEX,state.m_refkey);
 
         return error;
-    }
-
-    irr::IrrlichtDevice* LuaEngine::getIrrlichtDevice()
-    {
-        return m_device;
-    }
-
-    bool LuaEngine::OnEvent(const irr::SEvent& e)
-    {
-        for(irr::u32 i = 0; i < m_plugins.size(); i++)
-        {
-            m_plugins[i]->OnEvent(e);
-        }
-        return false;
-    }
-
-
-    int LuaEngine::lua_Suspend(lua_State* pLua)
-    {
-        
-        lua_yield(pLua,0);
-        
-
-        return 0;
-    }
-
-    int LuaEngine::lua_AtPanic(lua_State* pLua)
-    {
-        const char* c = lua_tostring(pLua, -1);
-        printf("Master VM Panic! This is facemelt: \n%s\n", c);
-        stackdump(pLua);
-        return 0;
     }
 
     void LuaEngine::stackdump(lua_State* l)

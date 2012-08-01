@@ -37,11 +37,21 @@ namespace Script
 
 namespace Script
 {
+
+    enum YieldStateMode
+    {
+        YieldStateMode_FrameCount,
+        YieldStateMode_RealTime,
+        YieldStateMode_GameTime
+    };
+
     class YieldState
     {
     public:
         lua_State*  m_thread;
-        int         m_refkey; 
+        int         m_refkey;
+        irr::u32    m_value;
+        YieldStateMode m_mode;
     };
 
     class LuaEngine : public irr::IEventReceiver
@@ -87,6 +97,9 @@ namespace Script
 
 
     private:
+
+        int resumeState(YieldState& state);
+
         irr::core::list<YieldState>  m_yieldlist;
 
         lua_State*           m_lua;
