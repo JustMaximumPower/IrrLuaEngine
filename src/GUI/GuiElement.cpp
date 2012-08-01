@@ -22,7 +22,7 @@ namespace Gui
         {NULL, NULL}  /* sentinel */
     };
 
-    GuiElement::GuiElement(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua):Script::LuaObject(engine,plua)
+    GuiElement::GuiElement(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua):Script::LuaObject(engine)
     {
         m_plugin = plugin;
         m_parent = NULL;

@@ -14,19 +14,19 @@ namespace Script
         {NULL, NULL}  /* sentinel */
     };
 
-    LuaObject::LuaObject(LuaEngine* engine, lua_State* plua)
+    LuaObject::LuaObject(LuaEngine* engine)
     {
         m_type = "";
-        m_lua = plua;
+        m_lua = engine->getLuaState();
         m_engine = engine;
 
-        lua_newtable(plua);
-        int table = lua_gettop(plua);
-        lua_newtable(plua);
-        lua_setfield(plua,table,"_methods");
-        lua_newtable(plua);
-        lua_setfield(plua,table,"_properties");
-        m_luaTableKey = luaL_ref(plua,LUA_REGISTRYINDEX);
+        lua_newtable(m_lua);
+        int table = lua_gettop(m_lua);
+        lua_newtable(m_lua);
+        lua_setfield(m_lua,table,"_methods");
+        lua_newtable(m_lua);
+        lua_setfield(m_lua,table,"_properties");
+        m_luaTableKey = luaL_ref(m_lua,LUA_REGISTRYINDEX);
     }
 
     
@@ -94,7 +94,8 @@ namespace Script
 
         if(lua_isfunction(pLua,-1))
         {
-            lua_pushvalue(pLua,2);
+            lua_insert(pLua,1);
+            lua_settop(pLua,3);
             lua_call(pLua,2,1);
             return 1;
         }
@@ -116,8 +117,8 @@ namespace Script
 
         if(lua_isfunction(pLua,-1))
         {
-            lua_pushvalue(pLua,2);
-            lua_pushvalue(pLua,3);
+            lua_insert(pLua,1);
+            lua_settop(pLua,4);
             lua_call(pLua,3,0);
             return 0;
         }

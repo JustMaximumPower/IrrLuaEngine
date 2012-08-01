@@ -92,28 +92,27 @@ namespace Script
         state.m_thread = lua_newthread(m_lua);
         state.m_refkey = luaL_ref(m_lua,LUA_REGISTRYINDEX);
 
-        int t = lua_status(state.m_thread);
-
-        //lua_getglobal(state.m_thread,"debug");
-        //lua_getfield(state.m_thread,-1,"traceback");
-
         lua_xmove(m_lua,state.m_thread,args+1);
-
-        //stackdump(state.m_thread);
-
-        //stackdump(m_lua);
-
-        t = lua_status(state.m_thread);
-
-        //int error = lua_pcall(state.m_thread, args,0,2);
-
+        
         int error = lua_resume(state.m_thread, args);
 
         if(error && error != LUA_YIELD)
         {
+            lua_getglobal(state.m_thread,"debug");
+            lua_getfield(state.m_thread,-1,"traceback");
+            lua_remove(state.m_thread,-2);
+            lua_insert(state.m_thread,-2);
+            lua_call(state.m_thread,1,1);
             const char* c = lua_tostring(state.m_thread, -1);
             printf("Error in runing Script! %i: \n%s\n", error, c);
         }
+        if(error == LUA_YIELD)
+        {
+            m_yieldlist.push_front(state);
+            return LUA_YIELD;
+        }
+
+        luaL_unref(m_lua,LUA_REGISTRYINDEX,state.m_refkey);
 
         return error;
     }
@@ -135,7 +134,8 @@ namespace Script
 
     int LuaEngine::lua_Suspend(lua_State* pLua)
     {
-        LuaEngine* pthis = getThisPointer(pLua);
+        
+        lua_yield(pLua,0);
         
 
         return 0;
@@ -159,6 +159,7 @@ namespace Script
         for (i = 1; i <= top; i++)
         {  /* repeat for each level */
             int t = lua_type(l, i);
+            printf("  ");  /* put a separator */
             switch (t) {
                 case LUA_TSTRING:  /* strings */
                     printf("string: '%s'\n", lua_tostring(l, i));
@@ -173,7 +174,7 @@ namespace Script
                     printf("%s\n", lua_typename(l, t));
                     break;
             }
-            printf("  ");  /* put a separator */
+            
         }
         printf("\n");  /* end the listing */
     }

@@ -10,7 +10,7 @@ function createButton(w,x,y)
 
 	btn.onHover = function(this)
 		this.test = this.test + 1
-		
+
 		this.text = this.test
 
 	end

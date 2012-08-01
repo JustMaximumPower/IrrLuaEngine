@@ -38,7 +38,7 @@ namespace Script
     {
     public:
 
-        LuaObject(LuaEngine* engine, lua_State* plua);
+        LuaObject(LuaEngine* engine);
 
         ~LuaObject();
 
