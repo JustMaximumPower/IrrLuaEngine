@@ -1,25 +1,25 @@
 /******************************************************************************
-* Copyright (C) 2012 Moritz Kühner, Germany.
-*
-* Permission is hereby granted, free of charge, to any person obtaining
-* a copy of this software and associated documentation files (the
-* "Software"), to deal in the Software without restriction, including
-* without limitation the rights to use, copy, modify, merge, publish,
-* distribute, sublicense, and/or sell copies of the Software, and to
-* permit persons to whom the Software is furnished to do so, subject to
-* the following conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-******************************************************************************/
+ * Copyright (C) 2012 Moritz Kühner, Germany.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ ******************************************************************************/
 #ifndef GUI_CLIENTLUAENGINE_h
 #define GUI_CLIENTLUAENGINE_h
 
@@ -32,82 +32,79 @@ class Game;
 
 namespace Script
 {
-    class ILuaEnginePlugin;
+     class ILuaEnginePlugin;
 }
 
 namespace Script
 {
 
-    enum YieldStateMode
-    {
-        YieldStateMode_FrameCount,
-        YieldStateMode_RealTime,
-        YieldStateMode_GameTime
-    };
+     enum YieldStateMode
+     {
+          YieldStateMode_FrameCount, YieldStateMode_RealTime, YieldStateMode_GameTime
+     };
 
-    class YieldState
-    {
-    public:
-        lua_State*  m_thread;
-        int         m_refkey;
-        irr::u32    m_value;
-        YieldStateMode m_mode;
-    };
+     class YieldState
+     {
+     public:
+          lua_State* m_thread;
+          int m_refkey;
+          irr::u32 m_value;
+          YieldStateMode m_mode;
+     };
 
-    class LuaEngine : public irr::IEventReceiver
-    {
-    public:
+     class LuaEngine: public irr::IEventReceiver
+     {
+     public:
 
-        LuaEngine(irr::IrrlichtDevice* irr);
+          LuaEngine(irr::IrrlichtDevice* irr);
 
-        void init();
+          void init();
 
-        void runFile(const irr::core::stringc& file);
-        
-        void run();
+          void runFile(const irr::core::stringc& file);
 
-        int doCall(int args,int rets);
+          void run();
 
-        irr::IrrlichtDevice* getIrrlichtDevice();
+          int doCall(int args, int rets);
 
-        static LuaEngine* getThisPointer(lua_State* pLua);
+          irr::IrrlichtDevice* getIrrlichtDevice();
 
-        virtual bool OnEvent(const irr::SEvent&);
+          static LuaEngine* getThisPointer(lua_State* pLua);
 
-        void addPlugin(ILuaEnginePlugin* p);
+          virtual bool OnEvent(const irr::SEvent&);
 
-        lua_State* getLuaState() const
-        {
-            return m_lua;
-        }
+          void addPlugin(ILuaEnginePlugin* p);
 
-        static void stackdump(lua_State* l);
+          lua_State* getLuaState() const
+          {
+               return m_lua;
+          }
 
-        //---- Lua funktions ------
+          static void stackdump(lua_State* l);
 
-        static int lua_Suspend(lua_State* pLua);
+          //---- Lua funktions ------
 
-        static int lua_AtPanic(lua_State* pLua);
+          static int lua_Suspend(lua_State* pLua);
 
-        //---- Lua Constants ------
+          static int lua_AtPanic(lua_State* pLua);
 
-        static const luaL_reg lua_globls [];
+          //---- Lua Constants ------
 
-        static const char* Lua_Object_Key;
+          static const luaL_reg lua_globls[];
 
+          static const char* Lua_Object_Key;
 
-    private:
+     private:
 
-        int resumeState(YieldState& state);
+          int resumeState(YieldState& state);
 
-        irr::core::list<YieldState>  m_yieldlist;
+          irr::core::list<YieldState> m_yieldlist;
 
-        lua_State*           m_lua;
-        irr::IrrlichtDevice* m_device; 
-        irr::core::array<ILuaEnginePlugin*> m_plugins;
-        int         m_errorhandler;
+          lua_State* m_lua;
+          irr::IrrlichtDevice* m_device;
+          irr::core::array<ILuaEnginePlugin*> m_plugins;
+          int m_errorhandler;
 
-    };
+     };
 }
 
 #endif

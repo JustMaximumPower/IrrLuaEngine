@@ -6,101 +6,96 @@
 #include "GuiButton.h"
 #include "IGUIElement.h"
 
-
-
-namespace Gui 
+namespace Gui
 {
 
-    const char* GuiWidget::lua_libName = "Widget";
+     const char* GuiWidget::lua_libName = "Widget";
 
+     const struct luaL_reg GuiWidget::lua_lib_m[] =
+     {
+     { "addElement", lua_addElement },
+     { NULL, NULL } /* sentinel */
+     };
 
-    const struct luaL_reg GuiWidget::lua_lib_m [] = {
-        {"addElement",lua_addElement},
-        {NULL, NULL}  /* sentinel */
-    };
+     const struct luaL_reg GuiWidget::lua_lib_f[] =
+     {
+     { "new", lua_new },
+     { NULL, NULL } /* sentinel */
+     };
 
-    const struct luaL_reg GuiWidget::lua_lib_f [] = {
-        {"new",lua_new},
-        {NULL, NULL}  /* sentinel */
-    };
+     GuiWidget::GuiWidget(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua) :
+               GuiElement(plugin, engine, plua)
+     {
 
+          const struct luaL_reg* i = lua_lib_m;
 
-    GuiWidget::GuiWidget(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua):GuiElement(plugin, engine, plua)
-    {
+          while(i->func && i->name)
+          {
+               addMethod(i->name, i->func);
+               i++;
+          }
+     }
 
-        const struct luaL_reg* i = lua_lib_m;
+     GuiWidget::~GuiWidget()
+     {
 
-        while(i->func && i->name)
-        {
-            addMethod(i->name,i->func);
-            i++;
-        }
-    }
-    
-    GuiWidget::~GuiWidget()
-    {
+     }
 
-    }
+     int GuiWidget::lua_new(lua_State* pLua)
+     {
+          GuiPlugin* plugin = GuiPlugin::getThisPointer(pLua);
+          Script::LuaEngine* engine = Script::LuaEngine::getThisPointer(pLua);
+          GuiWidget* pthis = new GuiWidget(plugin, engine, pLua);
 
-    int GuiWidget::lua_new(lua_State* pLua)
-    {
-        GuiPlugin* plugin = GuiPlugin::getThisPointer(pLua);
-        Script::LuaEngine* engine = Script::LuaEngine::getThisPointer(pLua);
-        GuiWidget* pthis = new GuiWidget(plugin,engine,pLua);
+          pthis->pushToStack(pLua);
 
-        pthis->pushToStack(pLua);
+          pthis->drop();
 
-        pthis->drop();
+          int x = (int) lua_tonumber(pLua, 1);
+          int y = (int) lua_tonumber(pLua, 2);
+          int w = (int) lua_tonumber(pLua, 3);
+          int h = (int) lua_tonumber(pLua, 4);
 
-        int x = (int)lua_tonumber(pLua,1);
-        int y = (int)lua_tonumber(pLua,2);
-        int w = (int)lua_tonumber(pLua,3);
-        int h = (int)lua_tonumber(pLua,4);
+          size_t len;
+          const char* text = luaL_optlstring(pLua, 5, "", &len);
+          wchar_t* textw = new wchar_t[++len];
+          mbstowcs(textw, text, len);
 
-        size_t len;
-        const char* text    = luaL_optlstring(pLua,5,"",&len);
-        wchar_t* textw      =  new wchar_t[++len];
-        mbstowcs(textw, text, len);
+          irr::gui::IGUIWindow* win =
+                    engine->getIrrlichtDevice()->getGUIEnvironment()->addWindow(
+                              irr::core::recti(x, y, x + w, y + h), false, textw, NULL,
+                              pthis->getId());
 
+          pthis->m_irrelement = win;
 
-        irr::gui::IGUIWindow* win = engine->getIrrlichtDevice()->getGUIEnvironment()->addWindow(
-                irr::core::recti(x,y,x+w,y+h),
-                false,
-                textw,
-                NULL,
-                pthis->getId()
-            );
+          delete textw;
 
-        pthis->m_irrelement = win;
+          return 1;
+     }
 
-        delete textw;
+     int GuiWidget::lua_addElement(lua_State* pLua)
+     {
+          GuiWidget* pthis = dynamic_cast<GuiWidget*>(lua_toGuiElement(pLua));
 
-        return 1;
-    }
-    
-    int GuiWidget::lua_addElement(lua_State* pLua)
-    {
-        GuiWidget* pthis = dynamic_cast<GuiWidget*>(lua_toGuiElement(pLua));
+          if (!pthis)
+          {
+               luaL_error(pLua, "Type missmatch for arg #1");
+          }
 
-        if(!pthis)
-        {
-            luaL_error(pLua,"Type missmatch for arg #1");
-        }
+          GuiElement* pother = lua_toGuiElement(pLua, 2);
 
-        GuiElement* pother = lua_toGuiElement(pLua,2);
+          pthis->m_children.push_back(pother);
+          pother->grab();
 
-        pthis->m_children.push_back(pother);
-        pother->grab();
+          irr::gui::IGUIElement* irrE = pother->getIrrlichtElement();
 
-        irr::gui::IGUIElement* irrE = pother->getIrrlichtElement();
+          if (irrE)
+          {
+               pthis->m_irrelement->addChild(irrE);
+          }
 
-        if(irrE)
-        {
-            pthis->m_irrelement->addChild(irrE);
-        }
-
-        return 0;
-    }
+          return 0;
+     }
 
 } /* End of namespace Gui */
 

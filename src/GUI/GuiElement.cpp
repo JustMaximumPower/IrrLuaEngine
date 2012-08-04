@@ -6,238 +6,241 @@
 #include "GuiButton.h"
 #include "IGUIElement.h"
 
-
-namespace Gui 
+namespace Gui
 {
-    const struct luaL_reg GuiElement::lua_lib_m [] = {
-        {"remove",lua_remove},
-        {NULL, NULL}  /* sentinel */
-    };
+     const struct luaL_reg GuiElement::lua_lib_m[] =
+     {
+     { "remove", lua_remove },
+     { NULL, NULL } /* sentinel */
+     };
 
-    const struct luaL_reg GuiElement::lua_lib_p [] = {
-        {"toolTip",lua_toolTip},
-        {"text",lua_text},
-        {"enabled",lua_enabled},
-        {"visible",lua_visible},
-        {"id",lua_id},
-        {"tabOrder",lua_tabOrder},
-        {NULL, NULL}  /* sentinel */
-    };
+     const struct luaL_reg GuiElement::lua_lib_p[] =
+     {
+     { "toolTip", lua_toolTip },
+     { "text", lua_text },
+     { "enabled", lua_enabled },
+     { "visible", lua_visible },
+     { "id", lua_id },
+     { "tabOrder", lua_tabOrder },
+     { NULL, NULL } /* sentinel */
+     };
 
-    GuiElement::GuiElement(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua):Script::LuaObject(engine)
-    {
-        m_plugin = plugin;
-        m_parent = NULL;
+     GuiElement::GuiElement(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua) :
+               Script::LuaObject(engine)
+     {
+          m_plugin = plugin;
+          m_parent = NULL;
 
-        m_id = m_plugin->getFreeId(this);
+          m_id = m_plugin->getFreeId(this);
 
-        const struct luaL_reg* i = lua_lib_m;
+          const struct luaL_reg* i = lua_lib_m;
 
-        while(i->func && i->name)
-        {
-            addMethod(i->name,i->func);
-            i++;
-        }
+          while(i->func && i->name)
+          {
+               addMethod(i->name, i->func);
+               i++;
+          }
 
-        i = lua_lib_p;
-        while(i->func && i->name)
-        {
-            addProperty(i->name,i->func);
-            i++;
-        }
+          i = lua_lib_p;
+          while(i->func && i->name)
+          {
+               addProperty(i->name, i->func);
+               i++;
+          }
 
-    }
-    
-    GuiElement::~GuiElement()
-    {
-        printf("GuiElement::~GuiElement\n");
+     }
 
-        //------- <debug code> 
-        irr::gui::IGUIElement* e = m_engine->getIrrlichtDevice()->getGUIEnvironment()->
-            getRootGUIElement()->getElementFromId(getId());
-        
-        if(e != m_irrelement)
-        {
-            printf("woooot!!!!\n");
-            return;
-        }
+     GuiElement::~GuiElement()
+     {
+          printf("GuiElement::~GuiElement\n");
 
-        //------- </debug code> 
-       
+          //------- <debug code> 
+          irr::gui::IGUIElement* e =
+                    m_engine->getIrrlichtDevice()->getGUIEnvironment()->getRootGUIElement()->getElementFromId(
+                              getId());
 
-        if(m_irrelement)
-        {
-            m_irrelement->remove();
-            m_irrelement = NULL;
-        }
-        m_plugin->freeElement(m_id);
-    }
+          if (e != m_irrelement)
+          {
+               printf("woooot!!!!\n");
+               return;
+          }
 
-    const int GuiElement::getId() const
-    {
-        return m_id;
-    }
+          //------- </debug code> 
 
-    irr::gui::IGUIElement* GuiElement::getIrrlichtElement() const
-    {
-        return m_irrelement;
-    }
+          if (m_irrelement)
+          {
+               m_irrelement->remove();
+               m_irrelement = NULL;
+          }
+          m_plugin->freeElement(m_id);
+     }
 
-    GuiElement* GuiElement::lua_toGuiElement(lua_State* pLua, int index)
-    {
-        GuiElement* pthis = dynamic_cast<GuiElement*>(Script::LuaObject::lua_toLuaObject(pLua, index));
-         
-        if(!pthis)
-        {
-            luaL_error(pLua,"Type missmatch for arg #%i",index);
-        }
-        return pthis;
-    }
+     const int GuiElement::getId() const
+     {
+          return m_id;
+     }
 
-    int GuiElement::lua_remove(lua_State* pLua)
-    {
-         GuiElement* pthis = lua_toGuiElement(pLua);
+     irr::gui::IGUIElement* GuiElement::getIrrlichtElement() const
+     {
+          return m_irrelement;
+     }
 
-         if(pthis->m_irrelement)
-         {
-             pthis->m_irrelement->remove();
-             pthis->m_irrelement = NULL;
-         }
-         return 0;
-    }
+     GuiElement* GuiElement::lua_toGuiElement(lua_State* pLua, int index)
+     {
+          GuiElement* pthis =
+                    dynamic_cast<GuiElement*>(Script::LuaObject::lua_toLuaObject(pLua,
+                              index));
 
-    int GuiElement::lua_toolTip(lua_State* pLua)
-    {
-         GuiElement* pthis = lua_toGuiElement(pLua);
-         const char* key = luaL_checkstring(pLua, 2);
-         
-         if(lua_gettop(pLua) == 2)
-         {
-            const irr::core::stringw& wtip = pthis->m_irrelement->getToolTipText();
-            char* tip = new char[wtip.size()+1];
-            wcstombs(tip,wtip.c_str(),wtip.size()+1);
-            lua_pushstring(pLua,tip);
-            delete tip;
-            return 1;
-         }
-         else
-         {
-            const char* text = luaL_checkstring(pLua, 3);
-            irr::core::stringw wtext(text);
-            pthis->m_irrelement->setToolTipText(wtext.c_str());
+          if (!pthis)
+          {
+               luaL_error(pLua, "Type missmatch for arg #%i", index);
+          }
+          return pthis;
+     }
 
-            return 0;
-         }
+     int GuiElement::lua_remove(lua_State* pLua)
+     {
+          GuiElement* pthis = lua_toGuiElement(pLua);
 
-         return 0;
-    }
+          if (pthis->m_irrelement)
+          {
+               pthis->m_irrelement->remove();
+               pthis->m_irrelement = NULL;
+          }
+          return 0;
+     }
 
-    int GuiElement::lua_text(lua_State* pLua)
-    {
-         GuiElement* pthis = lua_toGuiElement(pLua);
-         const char* key = luaL_checkstring(pLua, 2);
-         
-         if(lua_gettop(pLua) == 2)
-         {
-            const irr::core::stringw& wtip = pthis->m_irrelement->getText();
-            char* tip = new char[wtip.size()+1];
-            wcstombs(tip,wtip.c_str(),wtip.size()+1);
-            lua_pushstring(pLua,tip);
-            delete tip;
-            return 1;
-         }
-         else
-         {
-            const char* text = luaL_checkstring(pLua, 3);
-            irr::core::stringw wtext(text);
-            pthis->m_irrelement->setText(wtext.c_str());
+     int GuiElement::lua_toolTip(lua_State* pLua)
+     {
+          GuiElement* pthis = lua_toGuiElement(pLua);
+          const char* key = luaL_checkstring(pLua, 2);
 
-            return 0;
-         }
+          if (lua_gettop(pLua) == 2)
+          {
+               const irr::core::stringw& wtip = pthis->m_irrelement->getToolTipText();
+               char* tip = new char[wtip.size() + 1];
+               wcstombs(tip, wtip.c_str(), wtip.size() + 1);
+               lua_pushstring(pLua, tip);
+               delete tip;
+               return 1;
+          }
+          else
+          {
+               const char* text = luaL_checkstring(pLua, 3);
+               irr::core::stringw wtext(text);
+               pthis->m_irrelement->setToolTipText(wtext.c_str());
 
-         return 0;
-    }
+               return 0;
+          }
 
-    int GuiElement::lua_enabled(lua_State* pLua)
-    {
-         GuiElement* pthis = lua_toGuiElement(pLua);
-         const char* key = luaL_checkstring(pLua, 2);
-         
-         if(lua_gettop(pLua) == 2)
-         {
-            lua_pushboolean(pLua,pthis->m_irrelement->isEnabled());
-            return 1;
-         }
-         else
-         {
-            bool b = lua_toboolean(pLua,3) != 0;
-            pthis->m_irrelement->setEnabled(b);
+          return 0;
+     }
 
-            return 0;
-         }
+     int GuiElement::lua_text(lua_State* pLua)
+     {
+          GuiElement* pthis = lua_toGuiElement(pLua);
+          const char* key = luaL_checkstring(pLua, 2);
 
-         return 0;
-    }
+          if (lua_gettop(pLua) == 2)
+          {
+               const irr::core::stringw& wtip = pthis->m_irrelement->getText();
+               char* tip = new char[wtip.size() + 1];
+               wcstombs(tip, wtip.c_str(), wtip.size() + 1);
+               lua_pushstring(pLua, tip);
+               delete tip;
+               return 1;
+          }
+          else
+          {
+               const char* text = luaL_checkstring(pLua, 3);
+               irr::core::stringw wtext(text);
+               pthis->m_irrelement->setText(wtext.c_str());
 
-    int GuiElement::lua_visible(lua_State* pLua)
-    {
-         GuiElement* pthis = lua_toGuiElement(pLua);
-         const char* key = luaL_checkstring(pLua, 2);
-         
-         if(lua_gettop(pLua) == 2)
-         {
-            lua_pushboolean(pLua,pthis->m_irrelement->isVisible());
-            return 1;
-         }
-         else
-         {
-            bool b = lua_toboolean(pLua,3) != 0;
-            pthis->m_irrelement->setVisible(b);
+               return 0;
+          }
 
-            return 0;
-         }
+          return 0;
+     }
 
-         return 0;
-    }
+     int GuiElement::lua_enabled(lua_State* pLua)
+     {
+          GuiElement* pthis = lua_toGuiElement(pLua);
+          const char* key = luaL_checkstring(pLua, 2);
 
-    int GuiElement::lua_id(lua_State* pLua)
-    {
-         GuiElement* pthis = lua_toGuiElement(pLua);
-         const char* key = luaL_checkstring(pLua, 2);
-         
-         if(lua_gettop(pLua) == 2)
-         {
-            lua_pushnumber(pLua,pthis->m_id);
-            return 1;
-         }
-         else
-         {
-            return luaL_error(pLua, "property id is readonly");
-         }
+          if (lua_gettop(pLua) == 2)
+          {
+               lua_pushboolean(pLua, pthis->m_irrelement->isEnabled());
+               return 1;
+          }
+          else
+          {
+               bool b = lua_toboolean(pLua, 3) != 0;
+               pthis->m_irrelement->setEnabled(b);
 
-         return 0;
-    }
+               return 0;
+          }
 
+          return 0;
+     }
 
-    int GuiElement::lua_tabOrder(lua_State* pLua)
-    {
-         GuiElement* pthis = lua_toGuiElement(pLua);
-         const char* key = luaL_checkstring(pLua, 2);
-         
-         if(lua_gettop(pLua) == 2)
-         {
-            lua_pushnumber(pLua,pthis->m_irrelement->getTabOrder());
-            return 1;
-         }
-         else
-         {
-            bool b = lua_toboolean(pLua,3) != 0;
-            pthis->m_irrelement->setVisible(b);
+     int GuiElement::lua_visible(lua_State* pLua)
+     {
+          GuiElement* pthis = lua_toGuiElement(pLua);
+          const char* key = luaL_checkstring(pLua, 2);
 
-            return 0;
-         }
+          if (lua_gettop(pLua) == 2)
+          {
+               lua_pushboolean(pLua, pthis->m_irrelement->isVisible());
+               return 1;
+          }
+          else
+          {
+               bool b = lua_toboolean(pLua, 3) != 0;
+               pthis->m_irrelement->setVisible(b);
 
-         return 0;
-    }
+               return 0;
+          }
+
+          return 0;
+     }
+
+     int GuiElement::lua_id(lua_State* pLua)
+     {
+          GuiElement* pthis = lua_toGuiElement(pLua);
+          const char* key = luaL_checkstring(pLua, 2);
+
+          if (lua_gettop(pLua) == 2)
+          {
+               lua_pushnumber(pLua, pthis->m_id);
+               return 1;
+          }
+          else
+          {
+               return luaL_error(pLua, "property id is readonly");
+          }
+
+          return 0;
+     }
+
+     int GuiElement::lua_tabOrder(lua_State* pLua)
+     {
+          GuiElement* pthis = lua_toGuiElement(pLua);
+          const char* key = luaL_checkstring(pLua, 2);
+
+          if (lua_gettop(pLua) == 2)
+          {
+               lua_pushnumber(pLua, pthis->m_irrelement->getTabOrder());
+               return 1;
+          }
+          else
+          {
+               bool b = lua_toboolean(pLua, 3) != 0;
+               pthis->m_irrelement->setVisible(b);
+
+               return 0;
+          }
+
+          return 0;
+     }
 
 } /* End of namespace Gui */
