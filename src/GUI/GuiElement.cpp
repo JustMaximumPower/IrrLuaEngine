@@ -19,6 +19,8 @@ namespace Gui
         {"text",lua_text},
         {"enabled",lua_enabled},
         {"visible",lua_visible},
+        {"id",lua_id},
+        {"tabOrder",lua_tabOrder},
         {NULL, NULL}  /* sentinel */
     };
 
@@ -185,6 +187,46 @@ namespace Gui
          if(lua_gettop(pLua) == 2)
          {
             lua_pushboolean(pLua,pthis->m_irrelement->isVisible());
+            return 1;
+         }
+         else
+         {
+            bool b = lua_toboolean(pLua,3) != 0;
+            pthis->m_irrelement->setVisible(b);
+
+            return 0;
+         }
+
+         return 0;
+    }
+
+    int GuiElement::lua_id(lua_State* pLua)
+    {
+         GuiElement* pthis = lua_toGuiElement(pLua);
+         const char* key = luaL_checkstring(pLua, 2);
+         
+         if(lua_gettop(pLua) == 2)
+         {
+            lua_pushnumber(pLua,pthis->m_id);
+            return 1;
+         }
+         else
+         {
+            return luaL_error(pLua, "property id is readonly");
+         }
+
+         return 0;
+    }
+
+
+    int GuiElement::lua_tabOrder(lua_State* pLua)
+    {
+         GuiElement* pthis = lua_toGuiElement(pLua);
+         const char* key = luaL_checkstring(pLua, 2);
+         
+         if(lua_gettop(pLua) == 2)
+         {
+            lua_pushnumber(pLua,pthis->m_irrelement->getTabOrder());
             return 1;
          }
          else

@@ -67,6 +67,10 @@ namespace Gui
 
         static int lua_visible(lua_State* pLua);
 
+        static int lua_id(lua_State* pLua);
+
+        static int lua_tabOrder(lua_State* pLua);
+
         irr::gui::IGUIElement* m_irrelement;
 
     private:

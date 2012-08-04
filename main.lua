@@ -67,4 +67,14 @@ function timer:onButton()
 
 end
 
+test = Button.new(10,110,100,100,"test","test!!!")
+
+function timer:onButton() 
+	print("testbutton id is: " .. self.id)
+	print("testbutton taborder is: " .. self.tabOrder)
+	
+	--print(pcall(self.id = 1))
+
+end
+
 print("lua loaded")
