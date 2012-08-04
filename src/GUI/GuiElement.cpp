@@ -10,18 +10,18 @@ namespace Gui
 {
      const struct luaL_reg GuiElement::lua_lib_m[] =
      {
-     { "remove", lua_remove },
+     { "remove", luaRemove },
      { NULL, NULL } /* sentinel */
      };
 
      const struct luaL_reg GuiElement::lua_lib_p[] =
      {
-     { "toolTip", lua_toolTip },
-     { "text", lua_text },
-     { "enabled", lua_enabled },
-     { "visible", lua_visible },
-     { "id", lua_id },
-     { "tabOrder", lua_tabOrder },
+     { "toolTip", luaToolTip },
+     { "text", luaText },
+     { "enabled", luaEnabled },
+     { "visible", luaVisible },
+     { "id", luaId },
+     { "tabOrder", luaTabOrder },
      { NULL, NULL } /* sentinel */
      };
 
@@ -54,19 +54,6 @@ namespace Gui
      {
           printf("GuiElement::~GuiElement\n");
 
-          //------- <debug code> 
-          irr::gui::IGUIElement* e =
-                    m_engine->getIrrlichtDevice()->getGUIEnvironment()->getRootGUIElement()->getElementFromId(
-                              getId());
-
-          if (e != m_irrelement)
-          {
-               printf("woooot!!!!\n");
-               return;
-          }
-
-          //------- </debug code> 
-
           if (m_irrelement)
           {
                m_irrelement->remove();
@@ -98,7 +85,7 @@ namespace Gui
           return pthis;
      }
 
-     int GuiElement::lua_remove(lua_State* pLua)
+     int GuiElement::luaRemove(lua_State* pLua)
      {
           GuiElement* pthis = lua_toGuiElement(pLua);
 
@@ -110,7 +97,7 @@ namespace Gui
           return 0;
      }
 
-     int GuiElement::lua_toolTip(lua_State* pLua)
+     int GuiElement::luaToolTip(lua_State* pLua)
      {
           GuiElement* pthis = lua_toGuiElement(pLua);
           const char* key = luaL_checkstring(pLua, 2);
@@ -136,7 +123,7 @@ namespace Gui
           return 0;
      }
 
-     int GuiElement::lua_text(lua_State* pLua)
+     int GuiElement::luaText(lua_State* pLua)
      {
           GuiElement* pthis = lua_toGuiElement(pLua);
           const char* key = luaL_checkstring(pLua, 2);
@@ -162,7 +149,7 @@ namespace Gui
           return 0;
      }
 
-     int GuiElement::lua_enabled(lua_State* pLua)
+     int GuiElement::luaEnabled(lua_State* pLua)
      {
           GuiElement* pthis = lua_toGuiElement(pLua);
           const char* key = luaL_checkstring(pLua, 2);
@@ -183,7 +170,7 @@ namespace Gui
           return 0;
      }
 
-     int GuiElement::lua_visible(lua_State* pLua)
+     int GuiElement::luaVisible(lua_State* pLua)
      {
           GuiElement* pthis = lua_toGuiElement(pLua);
           const char* key = luaL_checkstring(pLua, 2);
@@ -204,7 +191,7 @@ namespace Gui
           return 0;
      }
 
-     int GuiElement::lua_id(lua_State* pLua)
+     int GuiElement::luaId(lua_State* pLua)
      {
           GuiElement* pthis = lua_toGuiElement(pLua);
           const char* key = luaL_checkstring(pLua, 2);
@@ -222,7 +209,7 @@ namespace Gui
           return 0;
      }
 
-     int GuiElement::lua_tabOrder(lua_State* pLua)
+     int GuiElement::luaTabOrder(lua_State* pLua)
      {
           GuiElement* pthis = lua_toGuiElement(pLua);
           const char* key = luaL_checkstring(pLua, 2);

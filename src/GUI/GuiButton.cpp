@@ -16,7 +16,7 @@ namespace Gui
 
      const struct luaL_reg GuiButton::lua_lib_f[] =
      {
-     { "new", lua_new },
+     { "new", luaNew },
      { NULL, NULL } /* sentinel */
      };
 
@@ -31,7 +31,7 @@ namespace Gui
 
      }
 
-     int GuiButton::lua_new(lua_State* pLua)
+     int GuiButton::luaNew(lua_State* pLua)
      {
           GuiPlugin* plugin = GuiPlugin::getThisPointer(pLua);
           Script::LuaEngine* engine = Script::LuaEngine::getThisPointer(pLua);

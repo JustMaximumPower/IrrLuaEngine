@@ -45,7 +45,7 @@ namespace Gui
 
           //---- Lua funktions ------
 
-          static int lua_new(lua_State* pLua);
+          static int luaNew(lua_State* pLua);
 
           //---- Lua Constants ------
 

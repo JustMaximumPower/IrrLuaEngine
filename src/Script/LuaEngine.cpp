@@ -106,11 +106,12 @@ namespace Script
 
      bool LuaEngine::OnEvent(const irr::SEvent& e)
      {
+          bool b = false;
           for (irr::u32 i = 0; i < m_plugins.size(); i++)
           {
-               m_plugins[i]->OnEvent(e);
+               b = m_plugins[i]->OnEvent(e) || b;
           }
-          return false;
+          return b;
      }
 
      int LuaEngine::lua_Suspend(lua_State* pLua)

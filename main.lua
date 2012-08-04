@@ -21,8 +21,9 @@ end
 
 function createWindow(k)
 	local w = Widget.new(100,100,k*100+10,k*100+25,"Hi")
-	w.onWindowClose = function(this)
+	function w:onWindowClose()
 		print("close")
+		self:remove()
 	end
 	
 	for i=0, k-1 do
@@ -67,13 +68,13 @@ function timer:onButton()
 
 end
 
-test = Button.new(10,110,100,100,"test","test!!!")
+test = Button.new(100,120,100,100,"test","test!!!")
 
-function timer:onButton() 
+function test:onButton() 
 	print("testbutton id is: " .. self.id)
 	print("testbutton taborder is: " .. self.tabOrder)
 	
-	--print(pcall(self.id = 1))
+	self.id = 1
 
 end
 

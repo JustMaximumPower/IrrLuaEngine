@@ -13,13 +13,13 @@ namespace Gui
 
      const struct luaL_reg GuiWidget::lua_lib_m[] =
      {
-     { "addElement", lua_addElement },
+     { "addElement", luaAddElement },
      { NULL, NULL } /* sentinel */
      };
 
      const struct luaL_reg GuiWidget::lua_lib_f[] =
      {
-     { "new", lua_new },
+     { "new", luaNew },
      { NULL, NULL } /* sentinel */
      };
 
@@ -41,7 +41,7 @@ namespace Gui
 
      }
 
-     int GuiWidget::lua_new(lua_State* pLua)
+     int GuiWidget::luaNew(lua_State* pLua)
      {
           GuiPlugin* plugin = GuiPlugin::getThisPointer(pLua);
           Script::LuaEngine* engine = Script::LuaEngine::getThisPointer(pLua);
@@ -50,6 +50,10 @@ namespace Gui
           pthis->pushToStack(pLua);
 
           pthis->drop();
+
+          lua_pushcfunction(pLua,luaRemove);
+
+          lua_setfield(pLua,-2,"onWindowClose");
 
           int x = (int) lua_tonumber(pLua, 1);
           int y = (int) lua_tonumber(pLua, 2);
@@ -68,12 +72,14 @@ namespace Gui
 
           pthis->m_irrelement = win;
 
+          //win->getCloseButton()->remove();
+
           delete textw;
 
           return 1;
      }
 
-     int GuiWidget::lua_addElement(lua_State* pLua)
+     int GuiWidget::luaAddElement(lua_State* pLua)
      {
           GuiWidget* pthis = dynamic_cast<GuiWidget*>(lua_toGuiElement(pLua));
 

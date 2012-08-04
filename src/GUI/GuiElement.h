@@ -56,24 +56,26 @@ namespace Gui
 
           GuiPlugin* m_plugin;
 
-          static int lua_remove(lua_State* pLua);
+          static int luaRemove(lua_State* pLua);
 
-          static int lua_toolTip(lua_State* pLua);
+          static int luaToolTip(lua_State* pLua);
 
-          static int lua_text(lua_State* pLua);
+          static int luaText(lua_State* pLua);
 
-          static int lua_enabled(lua_State* pLua);
+          static int luaEnabled(lua_State* pLua);
 
-          static int lua_visible(lua_State* pLua);
+          static int luaVisible(lua_State* pLua);
 
-          static int lua_id(lua_State* pLua);
+          static int luaId(lua_State* pLua);
 
-          static int lua_tabOrder(lua_State* pLua);
+          static int luaTabOrder(lua_State* pLua);
 
           irr::gui::IGUIElement* m_irrelement;
 
      private:
+
           int m_luaTableKey;
+
           int m_id;
 
           static const struct luaL_reg lua_lib_m[];
