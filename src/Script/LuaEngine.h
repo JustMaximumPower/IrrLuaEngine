@@ -58,6 +58,8 @@ namespace Script
 
           LuaEngine(irr::IrrlichtDevice* irr);
 
+          ~LuaEngine();
+
           void init();
 
           void runFile(const irr::core::stringc& file);

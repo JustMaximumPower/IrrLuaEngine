@@ -37,6 +37,15 @@ namespace Script
           luaL_openlib(m_lua, NULL, LuaObject::s_methods, 0);
      }
 
+     LuaEngine::~LuaEngine()
+     {          
+          lua_close(m_lua);
+          for (irr::u32 i = 0; i < m_plugins.size(); i++)
+          {
+               delete m_plugins[i];
+          }
+     }
+
      void LuaEngine::run()
      {
           irr::core::list<YieldState> yieldlist = m_yieldlist;
