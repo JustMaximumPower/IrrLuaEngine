@@ -12,10 +12,10 @@ Compiling
 
 There is a cmake script to compile the code. It assumes a workspace like this:
 
-workspace --+-----  IrrLuaEngine
+```workspace --+-----  IrrLuaEngine
             |
             +-----  irrlicht-1.7.3
             |
-            +-----  luajit-2.0
+            +-----  luajit-2.0```
 
 Download luajit, Irrlicht and this project in an folder and run cmake then make.
