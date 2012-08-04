@@ -29,33 +29,33 @@
 
 namespace Script
 {
-     class LuaEngine;
+    class LuaEngine;
 }
 
 namespace Gui
 {
 
-     class GuiButton: public GuiElement
-     {
+    class GuiButton: public GuiElement
+    {
 
-     public:
-          GuiButton(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua);
+    public:
+        GuiButton(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua);
 
-          ~GuiButton();
+        ~GuiButton();
 
-          //---- Lua funktions ------
+        //---- Lua funktions ------
 
-          static int luaNew(lua_State* pLua);
+        static int luaNew(lua_State* pLua);
 
-          //---- Lua Constants ------
+        //---- Lua Constants ------
 
-          static const char* lua_libName;
+        static const char* lua_libName;
 
-          static const struct luaL_reg lua_lib_m[];
+        static const struct luaL_reg lua_lib_m[];
 
-          static const struct luaL_reg lua_lib_f[];
+        static const struct luaL_reg lua_lib_f[];
 
-     };
+    };
 
 }
 

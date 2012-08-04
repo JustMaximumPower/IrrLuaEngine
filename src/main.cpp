@@ -26,28 +26,28 @@
 int main(int argc, const char* argv[])
 {
 #ifdef __debug__
-     try
-     {
+    try
+    {
 #endif
 #ifdef NO_STDOUT_BUFFERING
-     setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stdout, NULL, _IONBF, 0);
 #endif
-     Game* game = new Game();
+    Game* game = new Game();
 
-     game->init(argc, argv);
+    game->init(argc, argv);
 
-     int ret = game->runGame();
+    int ret = game->runGame();
 
-     delete game;
+    delete game;
 
-     return ret;
+    return ret;
 
 #ifdef __debug__
 }
 catch (std::exception& say)
 {
-     printf("%s", say.what());
-     return 1337;
+    printf("%s", say.what());
+    return 1337;
 }
 #endif
 }

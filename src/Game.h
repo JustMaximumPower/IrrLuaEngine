@@ -29,54 +29,54 @@
 
 namespace Script
 {
-     class LuaEngine;
+    class LuaEngine;
 }
 
 class Game: public Script::ILuaEnginePlugin
 {
 public:
 
-     Game();
+    Game();
 
-     virtual ~Game();
+    virtual ~Game();
 
-     void init(int argc, const char* argv[]);
+    void init(int argc, const char* argv[]);
 
-     int runGame();
+    int runGame();
 
-     void closeGame();
+    void closeGame();
 
-     irr::IrrlichtDevice* getIrrlichtDevice() const;
+    irr::IrrlichtDevice* getIrrlichtDevice() const;
 
-     irr::video::IVideoDriver* getVideoDriver() const;
+    irr::video::IVideoDriver* getVideoDriver() const;
 
-     static Game* getThisPointer(lua_State* pLua);
+    static Game* getThisPointer(lua_State* pLua);
 
-     virtual void registerFunktions(lua_State* pLua);
+    virtual void registerFunktions(lua_State* pLua);
 
-     virtual void run();
+    virtual void run();
 
-     virtual bool OnEvent(const irr::SEvent&);
+    virtual bool OnEvent(const irr::SEvent&);
 
-     //---- Lua funktions ------
+    //---- Lua funktions ------
 
-     static int lua_ExitGame(lua_State* pLua);
+    static int lua_ExitGame(lua_State* pLua);
 
-     //---- Lua Constants ------
+    //---- Lua Constants ------
 
-     static const char * lua_libName;
+    static const char * lua_libName;
 
-     static const luaL_reg lua_lib[];
+    static const luaL_reg lua_lib[];
 
-     static const char* Lua_Object_Key;
+    static const char* Lua_Object_Key;
 
 private:
 
-     Script::LuaEngine* m_script;
+    Script::LuaEngine* m_script;
 
-     irr::IrrlichtDevice* m_device;
+    irr::IrrlichtDevice* m_device;
 
-     irr::video::IVideoDriver* m_driver;
+    irr::video::IVideoDriver* m_driver;
 };
 
 #endif /* GAME_H_ */

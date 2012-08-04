@@ -32,81 +32,81 @@ class Game;
 
 namespace Script
 {
-     class ILuaEnginePlugin;
+    class ILuaEnginePlugin;
 }
 
 namespace Script
 {
 
-     enum YieldStateMode
-     {
-          YieldStateMode_FrameCount, YieldStateMode_RealTime, YieldStateMode_GameTime
-     };
+    enum YieldStateMode
+    {
+        YieldStateMode_FrameCount, YieldStateMode_RealTime, YieldStateMode_GameTime
+    };
 
-     class YieldState
-     {
-     public:
-          lua_State* m_thread;
-          int m_refkey;
-          irr::u32 m_value;
-          YieldStateMode m_mode;
-     };
+    class YieldState
+    {
+    public:
+        lua_State* m_thread;
+        int m_refkey;
+        irr::u32 m_value;
+        YieldStateMode m_mode;
+    };
 
-     class LuaEngine: public irr::IEventReceiver
-     {
-     public:
+    class LuaEngine: public irr::IEventReceiver
+    {
+    public:
 
-          LuaEngine(irr::IrrlichtDevice* irr);
+        LuaEngine(irr::IrrlichtDevice* irr);
 
-          ~LuaEngine();
+        ~LuaEngine();
 
-          void init();
+        void init();
 
-          void runFile(const irr::core::stringc& file);
+        void runFile(const irr::core::stringc& file);
 
-          void run();
+        void run();
 
-          int doCall(int args, int rets);
+        int doCall(int args, int rets);
 
-          irr::IrrlichtDevice* getIrrlichtDevice();
+        irr::IrrlichtDevice* getIrrlichtDevice();
 
-          static LuaEngine* getThisPointer(lua_State* pLua);
+        static LuaEngine* getThisPointer(lua_State* pLua);
 
-          virtual bool OnEvent(const irr::SEvent&);
+        virtual bool OnEvent(const irr::SEvent&);
 
-          void addPlugin(ILuaEnginePlugin* p);
+        void addPlugin(ILuaEnginePlugin* p);
 
-          lua_State* getLuaState() const
-          {
-               return m_lua;
-          }
+        lua_State* getLuaState() const
+        {
+            return m_lua;
+        }
 
-          static void stackdump(lua_State* l);
+        static void stackdump(lua_State* l);
 
-          //---- Lua funktions ------
+        //---- Lua funktions ------
 
-          static int lua_Suspend(lua_State* pLua);
+        static int lua_Suspend(lua_State* pLua);
 
-          static int lua_AtPanic(lua_State* pLua);
+        static int lua_AtPanic(lua_State* pLua);
 
-          //---- Lua Constants ------
+        //---- Lua Constants ------
 
-          static const luaL_reg lua_globls[];
+        static const luaL_reg lua_globls[];
 
-          static const char* Lua_Object_Key;
+        static const char* Lua_Object_Key;
 
-     private:
+    private:
 
-          int resumeState(YieldState& state);
+        int resumeState(YieldState& state);
 
-          irr::core::list<YieldState> m_yieldlist;
+        irr::core::list<YieldState> m_yieldlist;
 
-          lua_State* m_lua;
-          irr::IrrlichtDevice* m_device;
-          irr::core::array<ILuaEnginePlugin*> m_plugins;
-          int m_errorhandler;
+        lua_State* m_lua;
+        irr::IrrlichtDevice* m_device;
+        irr::core::array<ILuaEnginePlugin*> m_plugins;
+        int m_errorhandler;
 
-     };
+    };
 }
 
 #endif

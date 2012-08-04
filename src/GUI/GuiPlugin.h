@@ -32,56 +32,56 @@ class Game;
 
 namespace Gui
 {
-     class GuiElement;
+    class GuiElement;
 }
 
 namespace Gui
 {
-     class GuiPlugin: public Script::ILuaEnginePlugin
-     {
-     public:
+    class GuiPlugin: public Script::ILuaEnginePlugin
+    {
+    public:
 
-          GuiPlugin(irr::IrrlichtDevice* irr);
+        GuiPlugin(irr::IrrlichtDevice* irr);
 
-          void init();
+        void init();
 
-          void draw();
+        void draw();
 
-          void runFile(const irr::core::stringc& file);
+        void runFile(const irr::core::stringc& file);
 
-          virtual void run();
+        virtual void run();
 
-          int getFreeId(Gui::GuiElement* e);
+        int getFreeId(Gui::GuiElement* e);
 
-          void freeElement(int i);
+        void freeElement(int i);
 
-          irr::IrrlichtDevice* getIrrlichtDevice();
+        irr::IrrlichtDevice* getIrrlichtDevice();
 
-          virtual bool OnEvent(const irr::SEvent&);
+        virtual bool OnEvent(const irr::SEvent&);
 
-          virtual void registerFunktions(lua_State* pLua);
+        virtual void registerFunktions(lua_State* pLua);
 
-          Gui::GuiElement* getElement(int id);
+        Gui::GuiElement* getElement(int id);
 
-          static GuiPlugin* getThisPointer(lua_State* pLua);
+        static GuiPlugin* getThisPointer(lua_State* pLua);
 
-          //---- Lua funktions ------
+        //---- Lua funktions ------
 
-          //---- Lua Constants ------
+        //---- Lua Constants ------
 
-          static const luaL_reg lua_globls[];
+        static const luaL_reg lua_globls[];
 
-          static const char* Lua_Object_Key;
+        static const char* Lua_Object_Key;
 
-     protected:
+    protected:
 
-          lua_State* m_lua;
-          irr::IrrlichtDevice* m_device;
+        lua_State* m_lua;
+        irr::IrrlichtDevice* m_device;
 
-     private:
-          irr::core::array<Gui::GuiElement*> m_elements;
+    private:
+        irr::core::array<Gui::GuiElement*> m_elements;
 
-     };
+    };
 }
 
 #endif

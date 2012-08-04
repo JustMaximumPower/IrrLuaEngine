@@ -29,59 +29,59 @@
 
 namespace Gui
 {
-     class GuiPlugin;
+    class GuiPlugin;
 }
 
 namespace Gui
 {
 
-     class GuiElement: public Script::LuaObject
-     {
+    class GuiElement: public Script::LuaObject
+    {
 
-     public:
+    public:
 
-          GuiElement(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua);
+        GuiElement(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua);
 
-          ~GuiElement();
+        ~GuiElement();
 
-          irr::gui::IGUIElement* getIrrlichtElement() const;
+        irr::gui::IGUIElement* getIrrlichtElement() const;
 
-          const int getId() const;
+        const int getId() const;
 
-     protected:
+    protected:
 
-          static GuiElement* lua_toGuiElement(lua_State* pLua, int index = 1);
+        static GuiElement* lua_toGuiElement(lua_State* pLua, int index = 1);
 
-          GuiElement *m_parent;
+        GuiElement *m_parent;
 
-          GuiPlugin* m_plugin;
+        GuiPlugin* m_plugin;
 
-          static int luaRemove(lua_State* pLua);
+        static int luaRemove(lua_State* pLua);
 
-          static int luaToolTip(lua_State* pLua);
+        static int luaToolTip(lua_State* pLua);
 
-          static int luaText(lua_State* pLua);
+        static int luaText(lua_State* pLua);
 
-          static int luaEnabled(lua_State* pLua);
+        static int luaEnabled(lua_State* pLua);
 
-          static int luaVisible(lua_State* pLua);
+        static int luaVisible(lua_State* pLua);
 
-          static int luaId(lua_State* pLua);
+        static int luaId(lua_State* pLua);
 
-          static int luaTabOrder(lua_State* pLua);
+        static int luaTabOrder(lua_State* pLua);
 
-          irr::gui::IGUIElement* m_irrelement;
+        irr::gui::IGUIElement* m_irrelement;
 
-     private:
+    private:
 
-          int m_luaTableKey;
+        int m_luaTableKey;
 
-          int m_id;
+        int m_id;
 
-          static const struct luaL_reg lua_lib_m[];
+        static const struct luaL_reg lua_lib_m[];
 
-          static const struct luaL_reg lua_lib_p[];
-     };
+        static const struct luaL_reg lua_lib_p[];
+    };
 
 }
 

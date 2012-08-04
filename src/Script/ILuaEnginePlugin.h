@@ -30,16 +30,16 @@ struct lua_State;
 namespace Script
 {
 
-     class ILuaEnginePlugin: public irr::IEventReceiver
-     {
-     public:
+    class ILuaEnginePlugin: public irr::IEventReceiver
+    {
+    public:
 
-          virtual void registerFunktions(lua_State* pLua) = 0;
+        virtual void registerFunktions(lua_State* pLua) = 0;
 
-          virtual void run() = 0;
+        virtual void run() = 0;
 
-          virtual bool OnEvent(const irr::SEvent&) = 0;
-     };
+        virtual bool OnEvent(const irr::SEvent&) = 0;
+    };
 }
 
 #endif

@@ -28,57 +28,57 @@
 
 namespace Script
 {
-     class LuaEngine;
+    class LuaEngine;
 }
 
 namespace Script
 {
 
-     class LuaObject: public irr::IReferenceCounted
-     {
-     public:
+    class LuaObject: public irr::IReferenceCounted
+    {
+    public:
 
-          LuaObject(LuaEngine* engine);
+        LuaObject(LuaEngine* engine);
 
-          ~LuaObject();
+        ~LuaObject();
 
-          void pushToStack(lua_State* plua);
+        void pushToStack(lua_State* plua);
 
-          void onEvent(const char* event);
+        void onEvent(const char* event);
 
-          //----- Lua Constants ------
+        //----- Lua Constants ------
 
-          static const char* Lua_Object_Metatable;
+        static const char* Lua_Object_Metatable;
 
-          static const struct luaL_reg s_methods[];
+        static const struct luaL_reg s_methods[];
 
-     protected:
+    protected:
 
-          static LuaObject* lua_toLuaObject(lua_State* pLua, int index = 1);
+        static LuaObject* lua_toLuaObject(lua_State* pLua, int index = 1);
 
-          void addMethod(const char* name, lua_CFunction f);
+        void addMethod(const char* name, lua_CFunction f);
 
-          void addProperty(const char* name, lua_CFunction f);
+        void addProperty(const char* name, lua_CFunction f);
 
-          LuaEngine* m_engine;
+        LuaEngine* m_engine;
 
-     private:
+    private:
 
-          //----- Lua Funktions ------
+        //----- Lua Funktions ------
 
-          static int lua_GC(lua_State* pLua);
+        static int lua_GC(lua_State* pLua);
 
-          static int lua_index(lua_State* pLua);
+        static int lua_index(lua_State* pLua);
 
-          static int lua_newindex(lua_State* pLua);
+        static int lua_newindex(lua_State* pLua);
 
-          int m_luaTableKey;
+        int m_luaTableKey;
 
-          lua_State* m_lua;
+        lua_State* m_lua;
 
-          const char* m_type;
+        const char* m_type;
 
-     };
+    };
 
 }
 
