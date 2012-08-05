@@ -3,7 +3,6 @@
 #include "GuiPlugin.h"
 #include "IrrlichtDevice.h"
 #include "IGUIEnvironment.h"
-#include "GuiButton.h"
 #include "IGUIElement.h"
 
 namespace Gui
@@ -71,8 +70,6 @@ namespace Gui
                         pthis->getId());
 
         pthis->m_irrelement = win;
-
-        //win->getCloseButton()->remove();
 
         delete textw;
 

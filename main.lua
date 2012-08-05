@@ -1,4 +1,4 @@
-
+--[[
 function createButton(w,x,y)
 	local btn = Button.new(x,y+25,100,100,"0","")
 	btn.test = 0
@@ -32,15 +32,25 @@ function createWindow(k)
 		end
 	end
 	return w
-end
+end]]
 
-open = Button.new(100,10,100,100,"Open","")
+open = Button.new(100,10,100,100,"Open","Opens new window")
+
 function open:onButton() 
-	if window then
-		window:remove()
+	local w = Widget.new(100,100,120,150,"Hi")
+	local btn = Button.new(10,20,100,100,"Print","Prints text of the EditBox")
+	local edt = EditBox.new("Text",10,120,100,20)
+	w:addElement(btn)
+	w:addElement(edt)
+	
+	btn.edt = edt
+	
+	function btn:onButton()
+		print(self.edt.text)
 	end
 	
-	window = createWindow(3)
+	self.window = w
+	
 end
 
 dogc = Button.new(210,10,100,100,"Do GC","")

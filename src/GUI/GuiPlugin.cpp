@@ -3,6 +3,7 @@
 #include "IGUIEnvironment.h"
 #include "GuiButton.h"
 #include "GuiWidget.h"
+#include "GuiEditBox.h"
 
 namespace Gui
 {
@@ -119,6 +120,7 @@ namespace Gui
 
         luaL_openlib(pLua, GuiButton::lua_libName, GuiButton::lua_lib_f, 0);
         luaL_openlib(pLua, GuiWidget::lua_libName, GuiWidget::lua_lib_f, 0);
+        luaL_openlib(pLua, GuiEditBox::lua_libName, GuiEditBox::lua_lib_f, 0);
     }
 
 }
