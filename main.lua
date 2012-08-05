@@ -17,7 +17,7 @@ open = Button.new(100,10,100,100,"Calculator","Open's new Calculator")
 open.windows = {}
 
 function open:onButton() 
-	local window = Widget.new(100,100,145,250,"Calculator")
+	local window = Widget.new(100,100,150,190,"Calculator")
 	local edt = EditBox.new("0",10,22,130,25)
 	window:addElement(edt)
 	window.screen = edt
@@ -38,20 +38,21 @@ function open:onButton()
 	newButton(115,85,"*",window)
 	newButton(115,50,"/",window)
 	
-	local btn = Button.new(70,155,25,25,"=")
+	local btn = Button.new(80,155,25,25,"=")
 	function btn:onButton()
-		if edt.text == "0" then
-			edt.text =  self.text
-		else
-			edt.text = edt.text .. self.text
+		local fun,err = loadstring("return ".. window.screen.text)
+		if not fun then
+			window.screen.text = err
+			return
 		end
+
+		local good, value = pcall(fun)
+
+		window.screen.text = value
 	end
-	w:addElement(btn)
-	
-	
+	window:addElement(btn)
 	
 	open.windows[#open.windows+1] = window
-	
 end
 
 dogc = Button.new(210,10,100,100,"Do GC")
@@ -73,8 +74,8 @@ function timer:onButton()
 	
 	while true do
 		timer.time = timer.time+1
-		suspend()
 		self.text = timer.time
+		suspend()
 	end
 
 end
