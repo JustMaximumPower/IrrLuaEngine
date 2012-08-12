@@ -11,6 +11,8 @@ namespace Gui
     const struct luaL_reg GuiElement::lua_lib_m[] =
     {
     { "remove", luaRemove },
+    { "getType", luaGetType},
+    { "getId", luaId},
     { NULL, NULL } /* sentinel */
     };
 
@@ -20,7 +22,6 @@ namespace Gui
     { "text", luaText },
     { "enabled", luaEnabled },
     { "visible", luaVisible },
-    { "id", luaId },
     { "tabOrder", luaTabOrder },
     { NULL, NULL } /* sentinel */
     };
@@ -62,6 +63,7 @@ namespace Gui
         m_plugin->freeElement(m_id);
     }
 
+
     const int GuiElement::getId() const
     {
         return m_id;
@@ -88,6 +90,8 @@ namespace Gui
     {
         GuiElement* pthis = lua_toGuiElement(pLua);
 
+        pthis->validate(pLua);
+
         if (pthis->m_irrelement)
         {
             pthis->m_irrelement->remove();
@@ -100,6 +104,8 @@ namespace Gui
     {
         GuiElement* pthis = lua_toGuiElement(pLua);
         const char* key = luaL_checkstring(pLua, 2);
+
+        pthis->validate(pLua);
 
         if (lua_gettop(pLua) == 2)
         {
@@ -127,6 +133,8 @@ namespace Gui
         GuiElement* pthis = lua_toGuiElement(pLua);
         const char* key = luaL_checkstring(pLua, 2);
 
+        pthis->validate(pLua);
+
         if (lua_gettop(pLua) == 2)
         {
             const irr::core::stringw& wtip = pthis->m_irrelement->getText();
@@ -153,6 +161,8 @@ namespace Gui
         GuiElement* pthis = lua_toGuiElement(pLua);
         const char* key = luaL_checkstring(pLua, 2);
 
+        pthis->validate(pLua);
+
         if (lua_gettop(pLua) == 2)
         {
             lua_pushboolean(pLua, pthis->m_irrelement->isEnabled());
@@ -173,6 +183,8 @@ namespace Gui
     {
         GuiElement* pthis = lua_toGuiElement(pLua);
         const char* key = luaL_checkstring(pLua, 2);
+        
+        pthis->validate(pLua);
 
         if (lua_gettop(pLua) == 2)
         {
@@ -193,25 +205,29 @@ namespace Gui
     int GuiElement::luaId(lua_State* pLua)
     {
         GuiElement* pthis = lua_toGuiElement(pLua);
-        const char* key = luaL_checkstring(pLua, 2);
 
-        if (lua_gettop(pLua) == 2)
-        {
-            lua_pushnumber(pLua, pthis->m_id);
-            return 1;
-        }
-        else
-        {
-            return luaL_error(pLua, "property id is readonly");
-        }
+        pthis->validate(pLua);
 
-        return 0;
+        lua_pushnumber(pLua, pthis->m_id);
+        return 1;
+    }
+
+    int GuiElement::luaGetType(lua_State* pLua)
+    {
+        GuiElement* pthis = lua_toGuiElement(pLua);
+
+        pthis->validate(pLua);
+
+        lua_pushstring(pLua, pthis->m_irrelement->getTypeName());
+        return 1;
     }
 
     int GuiElement::luaTabOrder(lua_State* pLua)
     {
         GuiElement* pthis = lua_toGuiElement(pLua);
         const char* key = luaL_checkstring(pLua, 2);
+
+        pthis->validate(pLua);
 
         if (lua_gettop(pLua) == 2)
         {
@@ -227,6 +243,14 @@ namespace Gui
         }
 
         return 0;
+    }
+
+    void GuiElement::validate(lua_State* pLua)
+    {
+        if(!m_irrelement)
+        {
+            luaL_error(pLua,"Element has been removed");
+        }
     }
 
 } /* End of namespace Gui */

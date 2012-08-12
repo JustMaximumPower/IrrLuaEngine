@@ -86,8 +86,10 @@ function test:onButton()
 	print("testbutton id is: " .. self.id)
 	print("testbutton taborder is: " .. self.tabOrder)
 	
-	self.id = 1
+	print(pcall(function() self.id = 1 end))
 
+	print("dad")
+	
 end
 
 print("lua loaded")

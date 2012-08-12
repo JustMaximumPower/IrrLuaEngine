@@ -85,7 +85,11 @@ namespace Gui
             luaL_error(pLua, "Type missmatch for arg #1");
         }
 
+        pthis->validate(pLua);
+
         GuiElement* pother = lua_toGuiElement(pLua, 2);
+
+        pother->validate(pLua);
 
         pthis->m_children.push_back(pother);
         pother->grab();

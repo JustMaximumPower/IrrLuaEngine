@@ -17,6 +17,7 @@ namespace Script
 
     LuaEngine::LuaEngine(irr::IrrlichtDevice* irr)
     {
+        m_framecount = 0;
         m_device = irr;
         m_lua = lua_open();
         luaL_openlibs(m_lua);
@@ -48,14 +49,15 @@ namespace Script
 
     void LuaEngine::run()
     {
-        irr::core::list<YieldState> yieldlist = m_yieldlist;
-        m_yieldlist.clear();
+        YieldState& i = m_yieldlist_frame.top();
 
-        for (irr::core::list<YieldState>::Iterator i = yieldlist.begin();
-                i != yieldlist.end(); i++)
+        while(m_framecount >= i.m_value)
         {
-            resumeState(*i);
+            YieldState copy = i;
+            m_yieldlist_frame.pop();
+            resumeState(copy);
         }
+
     }
 
     void LuaEngine::addPlugin(ILuaEnginePlugin* p)
@@ -138,7 +140,7 @@ namespace Script
         }
         else
         {
-            luaL_checklstring(pLua, 1, NULL);
+            luaL_checkstring(pLua, 1);
             luaL_checknumber(pLua, 2);
             lua_settop(pLua, 2);
         }
@@ -171,13 +173,36 @@ namespace Script
         }
         if (error == LUA_YIELD)
         {
-            m_yieldlist.push_front(state);
+            const char* mode =  luaL_checkstring(state.m_thread, -2);
+            state.m_value    =  luaL_checknumber(state.m_thread, -1);
+
+            switch(*mode)
+            {
+                case 'f':
+                    state.m_value += m_framecount;
+                    m_yieldlist_frame.push(state);
+                    break;
+                case 'g':
+                    state.m_value += m_device->getTimer()->getTime();
+                    m_yieldlist_gametime.push(state);
+                    break;
+                case 'r':
+                    state.m_value += m_device->getTimer()->getRealTime();
+                    m_yieldlist_realtime.push(state);
+                    break;
+            }
+            
             return LUA_YIELD;
         }
 
         luaL_unref(m_lua, LUA_REGISTRYINDEX, state.m_refkey);
 
         return error;
+    }
+
+    lua_State* LuaEngine::getLuaState() const
+    {
+        return m_lua;
     }
 
     void LuaEngine::stackdump(lua_State* l)

@@ -27,6 +27,7 @@
 #include "IEventReceiver.h"
 #include "IrrlichtDevice.h"
 #include <irrList.h>
+#include <queue>
 
 class Game;
 
@@ -37,20 +38,24 @@ namespace Script
 
 namespace Script
 {
-
-    enum YieldStateMode
-    {
-        YieldStateMode_FrameCount, YieldStateMode_RealTime, YieldStateMode_GameTime
-    };
-
     class YieldState
     {
     public:
         lua_State* m_thread;
         int m_refkey;
-        irr::u32 m_value;
-        YieldStateMode m_mode;
+        irr::f64 m_value;
+
+        bool operator<(const YieldState& other)
+        {
+            //this may seem wrong but it is right
+        	//since object with low priority have
+        	//to rise to top
+            return m_value>other.m_value;
+        }
     };
+
+
+
 
     class LuaEngine: public irr::IEventReceiver
     {
@@ -76,10 +81,7 @@ namespace Script
 
         void addPlugin(ILuaEnginePlugin* p);
 
-        lua_State* getLuaState() const
-        {
-            return m_lua;
-        }
+        lua_State* getLuaState() const;
 
         static void stackdump(lua_State* l);
 
@@ -96,15 +98,17 @@ namespace Script
         static const char* Lua_Object_Key;
 
     private:
-
         int resumeState(YieldState& state);
-
-        irr::core::list<YieldState> m_yieldlist;
+     
+        std::priority_queue<YieldState> m_yieldlist_frame;
+        std::priority_queue<YieldState> m_yieldlist_realtime;
+        std::priority_queue<YieldState> m_yieldlist_gametime;
 
         lua_State* m_lua;
         irr::IrrlichtDevice* m_device;
         irr::core::array<ILuaEnginePlugin*> m_plugins;
         int m_errorhandler;
+        int m_framecount;
 
     };
 }

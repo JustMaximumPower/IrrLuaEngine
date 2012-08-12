@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (IrrLuaEngine)
 
-SET(CMAKE_BUILD_TYPE Release)
+SET(CMAKE_BUILD_TYPE Debug)
 
 SET(WORKSPACE "../")
 

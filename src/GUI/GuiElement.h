@@ -48,6 +48,8 @@ namespace Gui
 
         const int getId() const;
 
+        void validate(lua_State* pLua);
+
     protected:
 
         static GuiElement* lua_toGuiElement(lua_State* pLua, int index = 1);
@@ -69,6 +71,8 @@ namespace Gui
         static int luaId(lua_State* pLua);
 
         static int luaTabOrder(lua_State* pLua);
+
+        static int luaGetType(lua_State* pLua);
 
         irr::gui::IGUIElement* m_irrelement;
 
