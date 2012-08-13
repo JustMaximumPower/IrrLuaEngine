@@ -3,6 +3,7 @@
 #include "IrrlichtDevice.h"
 #include "IGUIEnvironment.h"
 #include "ILuaEnginePlugin.h"
+#include <cstdio>
 
 namespace Script
 {
@@ -49,14 +50,42 @@ namespace Script
 
     void LuaEngine::run()
     {
-        YieldState& i = m_yieldlist_frame.top();
+    	m_framecount++;
+    	if(!m_yieldlist_frame.empty())
+    	{
+			const YieldState& i = m_yieldlist_frame.top();
 
-        while(m_framecount >= i.m_value)
-        {
-            YieldState copy = i;
-            m_yieldlist_frame.pop();
-            resumeState(copy);
-        }
+			while(m_framecount >= i.m_value)
+			{
+				YieldState copy = i;
+				m_yieldlist_frame.pop();
+				resumeState(copy);
+			}
+    	}
+
+    	if(!m_yieldlist_gametime.empty())
+    	{
+			const YieldState& i = m_yieldlist_gametime.top();
+
+			while(m_device->getTimer()->getTime() >= i.m_value)
+			{
+				YieldState copy = i;
+				m_yieldlist_gametime.pop();
+				resumeState(copy);
+			}
+    	}
+
+    	if(!m_yieldlist_realtime.empty())
+    	{
+			const YieldState& i = m_yieldlist_realtime.top();
+
+			while(m_device->getTimer()->getRealTime() >= i.m_value)
+			{
+				YieldState copy = i;
+				m_yieldlist_realtime.pop();
+				resumeState(copy);
+			}
+    	}
 
     }
 

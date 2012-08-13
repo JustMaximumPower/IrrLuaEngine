@@ -45,7 +45,7 @@ namespace Script
         int m_refkey;
         irr::f64 m_value;
 
-        bool operator<(const YieldState& other)
+        bool operator<(const YieldState& other) const
         {
             //this may seem wrong but it is right
         	//since object with low priority have

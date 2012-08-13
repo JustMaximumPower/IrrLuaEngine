@@ -61,24 +61,35 @@ function dogc:onButton()
 end
 
 rem = Button.new(320,10,100,100,"Remove this!")
-function rem:onButton() 
+function rem:onButton()
+	self.text = "3..."
+	suspend("r",1000)
+	self.text = "2..."
+	suspend("r",1000)
+	self.text = "1..."
+	suspend("r",1000)
 	self:remove()
 end
 
 timer = Button.new(430,10,100,100,"Time")
 timer.time = 0
 function timer:onButton() 
-	if timer.time ~= 0 then
+	if self.time ~= 0 then
 		return
 	end
 	
 	while true do
-		timer.time = timer.time+1
-		self.text = timer.time
-		suspend()
+		self.time = self.time+1
+		self.text = self.time
+		suspend("r",1000)
 	end
 
 end
+
+timer2 = Button.new(430,120,100,100,"Time")
+timer2.time = 0
+timer2.onButton = timer.onButton
+
 
 test = Button.new(100,120,100,100,"test","test!!!")
 
