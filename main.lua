@@ -83,12 +83,22 @@ function timer:onButton()
 		self.text = self.time
 		suspend("f",10)
 	end
-
 end
 
 timer2 = Button.new(430,120,100,100,"Time")
 timer2.time = 0
-timer2.onButton = timer.onButton
+function timer2:onButton() 
+	if self.time ~= 0 then
+		return
+	end
+	
+	while true do
+		self.time = self.time+1
+		self.text = self.time
+		self.height = self.time%100;
+		suspend("r",100)
+	end
+end
 
 
 test = Button.new(100,120,100,100,"test","test!!!")

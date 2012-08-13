@@ -23,6 +23,10 @@ namespace Gui
     { "enabled", luaEnabled },
     { "visible", luaVisible },
     { "tabOrder", luaTabOrder },
+    { "x", luaX },
+    { "y", luaY },
+    { "height", luaHeight },
+    { "width", luaWidth },
     { NULL, NULL } /* sentinel */
     };
 
@@ -124,8 +128,6 @@ namespace Gui
 
             return 0;
         }
-
-        return 0;
     }
 
     int GuiElement::luaText(lua_State* pLua)
@@ -152,8 +154,6 @@ namespace Gui
 
             return 0;
         }
-
-        return 0;
     }
 
     int GuiElement::luaEnabled(lua_State* pLua)
@@ -175,8 +175,6 @@ namespace Gui
 
             return 0;
         }
-
-        return 0;
     }
 
     int GuiElement::luaVisible(lua_State* pLua)
@@ -198,8 +196,6 @@ namespace Gui
 
             return 0;
         }
-
-        return 0;
     }
 
     int GuiElement::luaId(lua_State* pLua)
@@ -241,8 +237,102 @@ namespace Gui
 
             return 0;
         }
+    }
 
-        return 0;
+    int GuiElement::luaX(lua_State* pLua)
+    {
+        GuiElement* pthis = lua_toGuiElement(pLua);
+        const char* key = luaL_checkstring(pLua, 2);
+
+        pthis->validate(pLua);
+
+        if (lua_gettop(pLua) == 2)
+        {
+            lua_pushnumber(pLua, pthis->m_irrelement->getRelativePosition().UpperLeftCorner.X);
+            return 1;
+        }
+        else
+        {
+            int x = luaL_checknumber(pLua,3);
+            irr::core::recti pos = pthis->m_irrelement->getRelativePosition();
+            pos.UpperLeftCorner.X = x;
+            pthis->m_irrelement->setRelativePosition(pos);
+            return 0;
+        }
+    }
+
+    int GuiElement::luaY(lua_State* pLua)
+    {
+        GuiElement* pthis = lua_toGuiElement(pLua);
+        const char* key = luaL_checkstring(pLua, 2);
+
+        pthis->validate(pLua);
+
+        if (lua_gettop(pLua) == 2)
+        {
+            lua_pushnumber(pLua, pthis->m_irrelement->getRelativePosition().UpperLeftCorner.Y);
+            return 1;
+        }
+        else
+        {
+            int y = luaL_checknumber(pLua,3);
+            irr::core::recti pos = pthis->m_irrelement->getRelativePosition();
+            pos.UpperLeftCorner.Y = y;
+            pthis->m_irrelement->setRelativePosition(pos);
+            return 0;
+        }
+    }
+
+    int GuiElement::luaHeight(lua_State* pLua)
+    {
+        GuiElement* pthis = lua_toGuiElement(pLua);
+        const char* key = luaL_checkstring(pLua, 2);
+
+        pthis->validate(pLua);
+
+        if (lua_gettop(pLua) == 2)
+        {
+            lua_pushnumber(pLua, pthis->m_irrelement->getRelativePosition().getHeight());
+            return 1;
+        }
+        else
+        {
+            int h = luaL_checknumber(pLua,3);
+            if(h < 0)
+            {
+                luaL_error(pLua,"Height must be a positive value");
+            }
+            irr::core::recti pos = pthis->m_irrelement->getRelativePosition();
+            pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + h;
+            pthis->m_irrelement->setRelativePosition(pos);
+            return 0;
+        }
+    }
+
+    int GuiElement::luaWidth(lua_State* pLua)
+    {
+        GuiElement* pthis = lua_toGuiElement(pLua);
+        const char* key = luaL_checkstring(pLua, 2);
+
+        pthis->validate(pLua);
+
+        if (lua_gettop(pLua) == 2)
+        {
+            lua_pushnumber(pLua, pthis->m_irrelement->getRelativePosition().getWidth());
+            return 1;
+        }
+        else
+        {
+            int w = luaL_checknumber(pLua,3);
+            if(w < 0)
+            {
+                luaL_error(pLua,"Width must be a positive value");
+            }
+            irr::core::recti pos = pthis->m_irrelement->getRelativePosition();
+            pos.LowerRightCorner.X = pos.UpperLeftCorner.X + w;
+            pthis->m_irrelement->setRelativePosition(pos);
+            return 0;
+        }
     }
 
     void GuiElement::validate(lua_State* pLua)
