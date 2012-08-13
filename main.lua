@@ -81,7 +81,7 @@ function timer:onButton()
 	while true do
 		self.time = self.time+1
 		self.text = self.time
-		suspend("r",1000)
+		suspend("f",10)
 	end
 
 end

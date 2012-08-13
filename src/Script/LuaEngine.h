@@ -48,7 +48,7 @@ namespace Script
         bool operator<(const YieldState& other) const
         {
             //this may seem wrong but it is right
-        	//since object with low priority have
+        	//since object with low value have
         	//to rise to top
             return m_value>other.m_value;
         }

@@ -51,11 +51,11 @@ namespace Script
     void LuaEngine::run()
     {
     	m_framecount++;
-    	if(!m_yieldlist_frame.empty())
+    	if(m_yieldlist_frame.size())
     	{
 			const YieldState& i = m_yieldlist_frame.top();
 
-			while(m_framecount >= i.m_value)
+			if(m_framecount >= i.m_value)
 			{
 				YieldState copy = i;
 				m_yieldlist_frame.pop();
@@ -63,11 +63,11 @@ namespace Script
 			}
     	}
 
-    	if(!m_yieldlist_gametime.empty())
+    	if(m_yieldlist_gametime.size())
     	{
 			const YieldState& i = m_yieldlist_gametime.top();
 
-			while(m_device->getTimer()->getTime() >= i.m_value)
+			if(m_device->getTimer()->getTime() >= i.m_value)
 			{
 				YieldState copy = i;
 				m_yieldlist_gametime.pop();
@@ -75,11 +75,11 @@ namespace Script
 			}
     	}
 
-    	if(!m_yieldlist_realtime.empty())
+        if(m_yieldlist_realtime.size())
     	{
 			const YieldState& i = m_yieldlist_realtime.top();
 
-			while(m_device->getTimer()->getRealTime() >= i.m_value)
+			if(m_device->getTimer()->getRealTime() >= i.m_value)
 			{
 				YieldState copy = i;
 				m_yieldlist_realtime.pop();
