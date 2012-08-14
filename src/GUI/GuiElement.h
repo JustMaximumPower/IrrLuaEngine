@@ -54,10 +54,6 @@ namespace Gui
 
         static GuiElement* lua_toGuiElement(lua_State* pLua, int index = 1);
 
-        GuiElement *m_parent;
-
-        GuiPlugin* m_plugin;
-
         static int luaRemove(lua_State* pLua);
 
         static int luaToolTip(lua_State* pLua);
@@ -83,6 +79,10 @@ namespace Gui
         static int luaWidth(lua_State* pLua);
 
         irr::gui::IGUIElement* m_irrelement;
+
+        GuiElement *m_parent;
+
+        GuiPlugin* m_plugin;
 
     private:
 
