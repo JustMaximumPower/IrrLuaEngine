@@ -13,6 +13,7 @@ namespace Gui
     { "remove", luaRemove },
     { "getType", luaGetType},
     { "getId", luaId},
+    { "getAbsolutePosition", luaGetAbsolutePosition},
     { NULL, NULL } /* sentinel */
     };
 
@@ -333,6 +334,22 @@ namespace Gui
             pthis->m_irrelement->setRelativePosition(pos);
             return 0;
         }
+    }
+
+    int GuiElement::luaGetAbsolutePosition(lua_State* pLua)
+    {
+        GuiElement* pthis = lua_toGuiElement(pLua);
+        pthis->validate(pLua);
+
+        irr::core::recti pos = pthis->m_irrelement->getAbsolutePosition();
+
+        lua_createtable(pLua,2,0);
+        lua_pushnumber(pLua,pos.UpperLeftCorner.X);
+        lua_rawseti(pLua,-2,1);
+        lua_pushnumber(pLua,pos.UpperLeftCorner.Y);
+        lua_rawseti(pLua,-2,2);
+
+        return 1;
     }
 
     void GuiElement::validate(lua_State* pLua)

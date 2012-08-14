@@ -70,6 +70,8 @@ namespace Gui
 
         static int luaGetType(lua_State* pLua);
 
+        static int luaGetAbsolutePosition(lua_State* pLua);
+
         static int luaX(lua_State* pLua);
 
         static int luaY(lua_State* pLua);
