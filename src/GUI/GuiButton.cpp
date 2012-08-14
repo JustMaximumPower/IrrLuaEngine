@@ -14,6 +14,15 @@ namespace Gui
     { NULL, NULL } /* sentinel */
     };
 
+    const struct luaL_reg GuiButton::lua_lib_p[] =
+    {
+    { "useAlpha", luaUseAlpha },
+    { "scaled", luaScaled },
+    { "drawBorder", luaDrawBorder },
+    { "isPushButton", luaDrawBorder },
+    { NULL, NULL } /* sentinel */
+    };
+
     const struct luaL_reg GuiButton::lua_lib_f[] =
     {
     { "new", luaNew },
@@ -23,7 +32,8 @@ namespace Gui
     GuiButton::GuiButton(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua) :
             GuiElement(plugin, engine, plua)
     {
-
+        addMethods(lua_lib_m);
+        addProperties(lua_lib_p);
     }
 
     GuiButton::~GuiButton()
@@ -64,6 +74,76 @@ namespace Gui
         pthis->drop();
 
         return 1;
+    }
+
+    int GuiButton::luaUseAlpha(lua_State* pLua)
+    {
+        GuiButton* pthis = lua_toGuiButton(pLua,1);
+        const char* key = luaL_checkstring(pLua, 2);
+        
+        pthis->validate(pLua);
+
+        if (lua_gettop(pLua) == 2)
+        {
+            lua_pushboolean(pLua, static_cast<irr::gui::IGUIButton*>(pthis->m_irrelement)->isAlphaChannelUsed());
+            return 1;
+        }
+        else
+        {
+            bool b = lua_toboolean(pLua, 3) != 0;
+            static_cast<irr::gui::IGUIButton*>(pthis->m_irrelement)->setUseAlphaChannel(b);
+            return 0;
+        }
+    }
+
+    int GuiButton::luaScaled(lua_State* pLua)
+    {
+        GuiButton* pthis = lua_toGuiButton(pLua,1);
+        const char* key = luaL_checkstring(pLua, 2);
+
+        pthis->validate(pLua);
+
+        if (lua_gettop(pLua) == 2)
+        {
+            lua_pushboolean(pLua, static_cast<irr::gui::IGUIButton*>(pthis->m_irrelement)->isScalingImage());
+            return 1;
+        }
+        else
+        {
+            bool b = lua_toboolean(pLua, 3) != 0;
+            static_cast<irr::gui::IGUIButton*>(pthis->m_irrelement)->setScaleImage(b);
+            return 0;
+        }
+    }
+
+    int GuiButton::luaDrawBorder(lua_State* pLua)
+    {
+        GuiButton* pthis = lua_toGuiButton(pLua,1);
+        const char* key = luaL_checkstring(pLua, 2);
+
+        pthis->validate(pLua);
+
+        if (lua_gettop(pLua) == 2)
+        {
+            lua_pushboolean(pLua, static_cast<irr::gui::IGUIButton*>(pthis->m_irrelement)->isDrawingBorder());
+            return 1;
+        }
+        else
+        {
+            bool b = lua_toboolean(pLua, 3) != 0;
+            static_cast<irr::gui::IGUIButton*>(pthis->m_irrelement)->setDrawBorder(b);
+            return 0;
+        }
+    }
+
+    GuiButton* GuiButton::lua_toGuiButton(lua_State* pLua,int index)
+    {
+        GuiButton* pthis = dynamic_cast<GuiButton*>(lua_toGuiElement(pLua,index));
+        if (!pthis)
+        {
+            luaL_error(pLua, "Type missmatch for arg #1");
+        }
+        return pthis;
     }
 
 } /* End of namespace Gui */

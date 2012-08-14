@@ -11,6 +11,7 @@ namespace Gui
 
     const struct luaL_reg GuiImage::lua_lib_m[] =
     {
+    { "setColor", luaSetColor },
     { NULL, NULL } /* sentinel */
     };
 
@@ -30,13 +31,8 @@ namespace Gui
     GuiImage::GuiImage(GuiPlugin* plugin, Script::LuaEngine* engine, lua_State* plua) :
             GuiElement(plugin, engine, plua)
     {
-        const struct luaL_reg* i = lua_lib_p;
-
-        while(i->func && i->name)
-        {
-            addProperty(i->name, i->func);
-            i++;
-        }
+        addMethods(lua_lib_m);
+        addProperties(lua_lib_p);
     }
 
     GuiImage::~GuiImage()
@@ -76,16 +72,10 @@ namespace Gui
 
     int GuiImage::luaUseAlpha(lua_State* pLua)
     {
-        GuiImage* pthis = dynamic_cast<GuiImage*>(lua_toGuiElement(pLua));
+        GuiImage* pthis = lua_toGuiImage(pLua,1);
         const char* key = luaL_checkstring(pLua, 2);
-
-        if (!pthis)
-        {
-            luaL_error(pLua, "Type missmatch for arg #1");
-        }
         
         pthis->validate(pLua);
-
 
         if (lua_gettop(pLua) == 2)
         {
@@ -102,16 +92,10 @@ namespace Gui
 
     int GuiImage::luaScaled(lua_State* pLua)
     {
-        GuiImage* pthis = dynamic_cast<GuiImage*>(lua_toGuiElement(pLua));
+        GuiImage* pthis = lua_toGuiImage(pLua,1);
         const char* key = luaL_checkstring(pLua, 2);
 
-        if (!pthis)
-        {
-            luaL_error(pLua, "Type missmatch for arg #1");
-        }
-        
         pthis->validate(pLua);
-
 
         if (lua_gettop(pLua) == 2)
         {
@@ -124,6 +108,27 @@ namespace Gui
             static_cast<irr::gui::IGUIImage*>(pthis->m_irrelement)->setScaleImage(b);
             return 0;
         }
+    }
+
+    int GuiImage::luaSetColor(lua_State* pLua)
+    {
+        GuiImage* pthis = lua_toGuiImage(pLua,1);
+        irr::u32 value = static_cast<irr::u32>(luaL_checknumber(pLua,2));
+        
+        pthis->validate(pLua);
+
+        static_cast<irr::gui::IGUIImage*>(pthis->m_irrelement)->setColor(irr::video::SColor(value));
+        return 0;
+    }
+
+    GuiImage* GuiImage::lua_toGuiImage(lua_State* pLua,int index)
+    {
+        GuiImage* pthis = dynamic_cast<GuiImage*>(lua_toGuiElement(pLua,index));
+        if (!pthis)
+        {
+            luaL_error(pLua, "Type missmatch for arg #1");
+        }
+        return pthis;
     }
 
 } /* End of namespace Gui */

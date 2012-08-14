@@ -56,13 +56,17 @@ namespace Script
 
         static LuaObject* lua_toLuaObject(lua_State* pLua, int index = 1);
 
-        void addMethod(const char* name, lua_CFunction f);
+        void addProperties(const luaL_reg*);
 
-        void addProperty(const char* name, lua_CFunction f);
+        void addMethods(const luaL_reg*);
 
         LuaEngine* m_engine;
 
     private:
+
+        void addMethod(const char* name, lua_CFunction f);
+
+        void addProperty(const char* name, lua_CFunction f);
 
         //----- Lua Funktions ------
 

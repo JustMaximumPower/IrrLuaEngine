@@ -39,21 +39,8 @@ namespace Gui
 
         m_id = m_plugin->getFreeId(this);
 
-        const struct luaL_reg* i = lua_lib_m;
-
-        while(i->func && i->name)
-        {
-            addMethod(i->name, i->func);
-            i++;
-        }
-
-        i = lua_lib_p;
-        while(i->func && i->name)
-        {
-            addProperty(i->name, i->func);
-            i++;
-        }
-
+        addMethods(lua_lib_m);
+        addProperties(lua_lib_p);
     }
 
     GuiElement::~GuiElement()

@@ -43,14 +43,6 @@ namespace Gui
 
         ~GuiImage();
 
-        //---- Lua funktions ------
-
-        static int luaNew(lua_State* pLua);
-
-        static int luaUseAlpha(lua_State* pLua);
-
-        static int luaScaled(lua_State* pLua);
-
         //---- Lua Constants ------
 
         static const char* lua_libName;
@@ -60,6 +52,19 @@ namespace Gui
         static const struct luaL_reg lua_lib_f[];
 
         static const struct luaL_reg lua_lib_p[];
+
+    private:
+        //---- Lua funktions ------
+
+        static int luaNew(lua_State* pLua);
+
+        static int luaUseAlpha(lua_State* pLua);
+
+        static int luaScaled(lua_State* pLua);
+
+        static int luaSetColor(lua_State* pLua);
+
+        static GuiImage* lua_toGuiImage(lua_State* pLua,int index);
 
     };
 

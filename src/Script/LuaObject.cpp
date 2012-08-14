@@ -130,6 +130,25 @@ namespace Script
                 Lua_Object_Metatable));
     }
 
+    void LuaObject::addProperties(const luaL_reg* i)
+    {
+        while(i->func && i->name)
+        {
+            addProperty(i->name, i->func);
+            i++;
+        }
+    }
+
+    void LuaObject::addMethods(const luaL_reg* i)
+    {
+        while(i->func && i->name)
+        {
+            addMethod(i->name, i->func);
+            i++;
+        }
+    }
+
+
     void LuaObject::addMethod(const char* name, lua_CFunction f)
     {
         lua_rawgeti(m_lua, LUA_REGISTRYINDEX, m_luaTableKey);

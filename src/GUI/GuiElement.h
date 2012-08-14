@@ -88,8 +88,6 @@ namespace Gui
 
     private:
 
-        int m_luaTableKey;
-
         int m_id;
 
         static const struct luaL_reg lua_lib_m[];

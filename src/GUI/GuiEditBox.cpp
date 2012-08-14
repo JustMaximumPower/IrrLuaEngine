@@ -26,13 +26,7 @@ namespace Gui
             GuiElement(plugin, engine, plua)
     {
 
-        const struct luaL_reg* i = lua_lib_m;
-
-        while(i->func && i->name)
-        {
-            addMethod(i->name, i->func);
-            i++;
-        }
+        addMethods(lua_lib_m);
     }
 
     GuiEditBox::~GuiEditBox()
