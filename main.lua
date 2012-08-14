@@ -81,7 +81,7 @@ function timer:onButton()
 	while true do
 		self.time = self.time+1
 		self.text = self.time
-		suspend("f",10)
+		suspend("r",10)
 	end
 end
 
@@ -104,13 +104,18 @@ end
 test = Button.new(100,120,100,100,"test","test!!!")
 
 function test:onButton() 
-	print("testbutton id is: " .. self.id)
+	print("testbutton id is: " .. self:getId())
 	print("testbutton taborder is: " .. self.tabOrder)
 	
-	print(pcall(function() self.id = 1 end))
-
-	print("dad")
+	function f(t)
+		print(t:getId())
+	end
 	
+	self:remove()
+	
+	local status, err = pcall(f,self)
+	print(status, err)
+
 end
 
 print("lua loaded")
