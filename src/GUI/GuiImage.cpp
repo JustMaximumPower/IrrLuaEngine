@@ -3,6 +3,7 @@
 #include "IrrlichtDevice.h"
 #include "IGUIEnvironment.h"
 #include "GuiPlugin.h"
+#include "Textur.h"
 
 namespace Gui
 {
@@ -12,6 +13,7 @@ namespace Gui
     const struct luaL_reg GuiImage::lua_lib_m[] =
     {
     { "setColor", luaSetColor },
+    { "setTextur", luaSetTextur },
     { NULL, NULL } /* sentinel */
     };
 
@@ -120,6 +122,17 @@ namespace Gui
         static_cast<irr::gui::IGUIImage*>(pthis->m_irrelement)->setColor(irr::video::SColor(value));
         return 0;
     }
+
+    int GuiImage::luaSetTextur(lua_State* pLua)
+    {
+        GuiImage* pthis = lua_toGuiImage(pLua,1);
+        Video::Textur* t = Video::Textur::lua_toTextur(pLua,2);
+        
+        pthis->validate(pLua);
+
+        static_cast<irr::gui::IGUIImage*>(pthis->m_irrelement)->setImage(t->getIrrTextur());
+        return 0;
+    }    
 
     GuiImage* GuiImage::lua_toGuiImage(lua_State* pLua,int index)
     {

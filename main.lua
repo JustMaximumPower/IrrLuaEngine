@@ -3,7 +3,9 @@
 image = Image.new(100,120,500,500,"image")
 image:setColor(0)
 
+textur = Textur.load("font1.png")
 
+image:setTextur(textur)
 
 
 

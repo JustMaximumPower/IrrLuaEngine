@@ -64,6 +64,8 @@ namespace Gui
 
         static int luaSetColor(lua_State* pLua);
 
+        static int luaSetTextur(lua_State* pLua);
+
         static GuiImage* lua_toGuiImage(lua_State* pLua,int index);
 
     };

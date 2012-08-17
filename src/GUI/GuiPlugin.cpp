@@ -124,7 +124,7 @@ namespace Gui
         luaL_openlib(pLua, GuiWidget::lua_libName, GuiWidget::lua_lib_f, 0);
         luaL_openlib(pLua, GuiEditBox::lua_libName, GuiEditBox::lua_lib_f, 0);
         luaL_openlib(pLua, GuiImage::lua_libName, GuiImage::lua_lib_f, 0);
-        luaL_openlib(pLua, Video::Textur::lua_libName, GuiImage::lua_lib_f, 0);
+        luaL_openlib(pLua, Video::Textur::lua_libName, Video::Textur::lua_lib_f, 0);
     }
 
 }
