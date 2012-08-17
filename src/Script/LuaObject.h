@@ -80,7 +80,7 @@ namespace Script
 
         lua_State* m_lua;
 
-        const char* m_type;
+        //const char* m_type;
 
     };
 

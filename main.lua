@@ -1,4 +1,12 @@
 
+
+image = Image.new(100,120,500,500,"image")
+image:setColor(0)
+
+
+
+
+
 function newButton(x,y,number,w)
 	local btn = Button.new(x,y,25,25,number)
 	local edt = w.screen
@@ -96,6 +104,7 @@ function timer2:onButton()
 		self.time = self.time+1
 		self.text = self.time
 		self.height = self.time%100;
+		self.drawBorder = self.time%5 ==1
 		suspend("r",100)
 	end
 end
@@ -106,6 +115,9 @@ test = Button.new(100,120,100,100,"test","test!!!")
 function test:onButton() 
 	print("testbutton id is: " .. self:getId())
 	print("testbutton taborder is: " .. self.tabOrder)
+	local pos = self:getAbsolutePosition()
+	print("absolut Position: x".. pos[1] .. " y"..pos[2])
+	
 	
 	function f(t)
 		print(t:getId())

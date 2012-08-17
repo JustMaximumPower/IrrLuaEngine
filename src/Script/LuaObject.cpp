@@ -15,7 +15,7 @@ namespace Script
 
     LuaObject::LuaObject(LuaEngine* engine)
     {
-        m_type = "";
+//        m_type = "";
         m_lua = engine->getLuaState();
         m_engine = engine;
 

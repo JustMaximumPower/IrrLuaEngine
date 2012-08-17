@@ -52,6 +52,8 @@ namespace Gui
 
     protected:
 
+        //----- Lua Funktions ------
+
         static GuiElement* lua_toGuiElement(lua_State* pLua, int index = 1);
 
         static int luaRemove(lua_State* pLua);
